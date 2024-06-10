@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 :root {
+  --primary-color: #c9a998;
+  --secondary-color: #d1b5a6;
+
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -11,4 +14,17 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  background-color: var(--primary-color);
+  color: white;
+}
+
+#logo {
+  background-color: #70dbb8;
+  background-image: linear-gradient(45deg, #a1d06d, white, #ffa001);
+  background-size: 100%;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-text-fill-color: transparent;
 }

@@ -1,5 +1,16 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Header from "./Pages/Header";
+
 function App() {
-  return <p>Test</p>;
+  return (
+    <>
+      <BrowserRouter>
+        <Header />
+
+        <Routes>{/* <Route path="/" element={<HomePage />} /> */}</Routes>
+      </BrowserRouter>
+    </>
+  );
 }
-// C9A998
+
 export default App;
