@@ -28,3 +28,25 @@
   -webkit-text-fill-color: transparent;
   -moz-text-fill-color: transparent;
 }
+
+/* NOTE: Load fonts to use */
+/* @font-face {
+  font-family: "AlexBush";
+  font-style: bold;
+  font-weight: 400;
+  font-display: swap;
+  src: url(Fonts/AlexBrush-Regular.ttf) format("woff2");
+} */
+
+@font-face {
+  font-family: "DancingScript";
+  font-style: bold;
+  font-weight: 900;
+  font-display: swap;
+  src: url(Fonts/DancingScript-VariableFont_wght.ttf) format("woff2");
+}
+
+.DancingScript {
+  /* font-family: AlexBush; */
+  font-family: DancingScript;
+}
