@@ -96,27 +96,134 @@ const HomePage = () => {
         </article>
       </div>
 
-      <article>
-        <h2>Trending</h2>
+      <section className="my-16">
+        <h2 className="Anton text-center text-4xl font-bold uppercase mb-8 tracking-[0.2em]">
+          Trending sells
+        </h2>
 
-        <ul>
-          <li>
-            <Link to="">
+        <ul className="p-4 min-[460px]:grid grid-cols-2 min-[700px]:grid-cols-3 min-[1000px]:grid-cols-4 gap-[16px] justify-items-center">
+          <li className="max-[460px]:mb-8">
+            <Link
+              to=""
+              className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+            >
               <figure className="">
                 <div className="">
-                  <img alt="" src="/heroImages/Hero photo-small.webp" />
+                  <img
+                    alt=""
+                    src="/heroImages/Hero photo-small.webp"
+                    className=" rounded-2xl"
+                  />
                 </div>
 
-                <figcaption>
-                  <p>$2,000</p>
-                  <p>Toyota Corolla 2024 Model</p>
-                  <p>Abuja, Nigeria</p>
+                <figcaption className="text-center mt-4">
+                  <p className="font-bold text-xl mb-4">$2,000</p>
+                  <p className="font-bold text-xl" id="one-line-ellipsis">
+                    Toyota Corolla 2024 Model Corolla 2024 Model
+                  </p>
+
+                  <p className="absolute top-0 text-sm font-bold">
+                    <em>Abuja, Nigeria</em>
+                  </p>
+                </figcaption>
+              </figure>
+            </Link>
+          </li>
+
+          <li className="max-[460px]:mb-8">
+            <Link
+              to=""
+              className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+            >
+              <figure className="">
+                <div className="">
+                  <img
+                    alt=""
+                    src="/heroImages/Hero photo-small.webp"
+                    className=" rounded-2xl"
+                  />
+                </div>
+
+                <figcaption className="text-center mt-4">
+                  <p className="font-bold text-xl mb-4">$2,000</p>
+                  <p className="font-bold text-xl" id="one-line-ellipsis">
+                    Toyota Corolla 2024 Model Corolla 2024 Model
+                  </p>
+
+                  <p className="absolute top-0 text-sm font-bold">
+                    <em>Abuja, Nigeria</em>
+                  </p>
+                </figcaption>
+              </figure>
+            </Link>
+          </li>
+
+          <li className="max-[460px]:mb-8">
+            <Link
+              to=""
+              className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+            >
+              <figure className="">
+                <div className="">
+                  <img
+                    alt=""
+                    src="/heroImages/Hero photo-small.webp"
+                    className=" rounded-2xl"
+                  />
+                </div>
+
+                <figcaption className="text-center mt-4">
+                  <p className="font-bold text-xl mb-4">$2,000</p>
+                  <p className="font-bold text-xl" id="one-line-ellipsis">
+                    Toyota Corolla 2024 Model Corolla 2024 Model
+                  </p>
+
+                  <p className="absolute top-0 text-sm font-bold">
+                    <em>Abuja, Nigeria</em>
+                  </p>
+                </figcaption>
+              </figure>
+            </Link>
+          </li>
+
+          <li className="max-[460px]:mb-8">
+            <Link
+              to=""
+              className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+            >
+              <figure className="">
+                <div className="">
+                  <img
+                    alt=""
+                    src="/heroImages/Hero photo-small.webp"
+                    className=" rounded-2xl"
+                  />
+                </div>
+
+                <figcaption className="text-center mt-4">
+                  <p className="font-bold text-xl mb-4">$2,000</p>
+                  <p className="font-bold text-xl" id="one-line-ellipsis">
+                    Toyota Corolla 2024 Model Corolla 2024 Model
+                  </p>
+
+                  <p className="absolute top-0 text-sm font-bold">
+                    <em>Abuja, Nigeria</em>
+                  </p>
                 </figcaption>
               </figure>
             </Link>
           </li>
         </ul>
-      </article>
+
+        <div className="flex justify-center p-4 mt-8">
+          <button
+            type="button"
+            className="Anton block uppercase ring-2 ring-white py-4 flex-[0_1_600px] text-xl rounded-full font-bold tracking-[0.3em] hover:bg-[#ffa001] transition-colors ease-out duration-500"
+          >
+            View more
+          </button>
+        </div>
+      </section>
     </main>
   );
 };

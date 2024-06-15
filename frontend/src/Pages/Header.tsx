@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { FaUserPlus } from "react-icons/fa";
 
 const Header = () => {
-  const user = true;
+  const user = false;
 
   return (
     <header className="p-4">
@@ -12,7 +12,7 @@ const Header = () => {
             <li>
               <Link
                 to=""
-                className="uppercase ring-1 ring-white w-[80px] flex justify-center py-1 rounded-2xl font-bold tracking-widest hover:bg-[#ffa001] transition-colors ease-out duration-500  min-[650px]:text-xl min-[650px]:w-[110px]"
+                className="uppercase ring-1 ring-white w-[80px] flex justify-center py-1 rounded-2xl font-bold tracking-[0.3em] hover:bg-[#ffa001] transition-colors ease-out duration-500  min-[650px]:text-xl min-[650px]:w-[110px]"
               >
                 Buy
               </Link>
@@ -21,7 +21,7 @@ const Header = () => {
             <li>
               <Link
                 to=""
-                className="uppercase ring-1 ring-white w-[80px] flex justify-center py-1 rounded-2xl font-bold tracking-widest hover:bg-[#ffa001] transition-colors ease-out duration-500 min-[650px]:text-xl min-[650px]:w-[110px]"
+                className="uppercase ring-1 ring-white w-[80px] flex justify-center py-1 rounded-2xl font-bold tracking-[0.3em] hover:bg-[#ffa001] transition-colors ease-out duration-500 min-[650px]:text-xl min-[650px]:w-[110px]"
               >
                 Sell
               </Link>

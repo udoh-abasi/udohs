@@ -30,13 +30,13 @@
 }
 
 /* NOTE: Load fonts to use */
-/* @font-face {
-  font-family: "AlexBush";
+@font-face {
+  font-family: "Anton";
   font-style: bold;
   font-weight: 400;
   font-display: swap;
-  src: url(Fonts/AlexBrush-Regular.ttf) format("woff2");
-} */
+  src: url(Fonts/Anton-Regular.ttf) format("woff2");
+}
 
 @font-face {
   font-family: "DancingScript";
@@ -47,6 +47,28 @@
 }
 
 .DancingScript {
-  /* font-family: AlexBush; */
-  font-family: DancingScript;
+  font-family: DancingScript, Arial, Helvetica, sans-serif; /* NOTE: Incase anything goes wrong and 'DancingScript' did not load, we will fall back to any of the remaining three font options specified here*/
+  /* font-family: DancingScript; */
+}
+
+.Anton {
+  /* font-family: Anton; */
+  font-family: Anton, Arial, Helvetica, sans-serif;
+}
+
+#one-line-ellipsis {
+  display: -webkit-box;
+
+  /* Limit the text to 1 lines */
+  -webkit-line-clamp: 1;
+
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+footer#pageFooter {
+  background: url(/footerWave.svg) no-repeat;
+  background-size: cover;
+  background-position: center;
 }
