@@ -1,8 +1,9 @@
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   return (
     <main>
       <div className="grid grid-cols-1 grid-rows-1">
@@ -107,8 +108,8 @@ const HomePage = () => {
               to=""
               className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
             >
-              <figure className="">
-                <div className="">
+              <figure>
+                <div>
                   <img
                     alt=""
                     src="/heroImages/Hero photo-small.webp"
@@ -135,8 +136,8 @@ const HomePage = () => {
               to=""
               className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
             >
-              <figure className="">
-                <div className="">
+              <figure>
+                <div>
                   <img
                     alt=""
                     src="/heroImages/Hero photo-small.webp"
@@ -163,8 +164,8 @@ const HomePage = () => {
               to=""
               className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
             >
-              <figure className="">
-                <div className="">
+              <figure>
+                <div>
                   <img
                     alt=""
                     src="/heroImages/Hero photo-small.webp"
@@ -191,8 +192,8 @@ const HomePage = () => {
               to=""
               className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
             >
-              <figure className="">
-                <div className="">
+              <figure>
+                <div>
                   <img
                     alt=""
                     src="/heroImages/Hero photo-small.webp"
@@ -219,6 +220,9 @@ const HomePage = () => {
           <button
             type="button"
             className="Anton block uppercase ring-2 ring-white py-4 flex-[0_1_600px] text-xl rounded-full font-bold tracking-[0.3em] hover:bg-[#ffa001] transition-colors ease-out duration-500"
+            onClick={() => {
+              navigate("/items");
+            }}
           >
             View more
           </button>

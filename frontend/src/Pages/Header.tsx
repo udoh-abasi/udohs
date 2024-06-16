@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { FaUserPlus } from "react-icons/fa";
 
 const Header = () => {
-  const user = false;
+  const user = true;
 
   return (
     <header className="p-4">
