@@ -73,6 +73,12 @@ footer#pageFooter {
   background-position: center;
 }
 
+/* #chatSketch {
+  background: url(/chatSketch.svg) no-repeat;
+  background-size: cover;
+  background-position: center;
+} */
+
 /* clears the ‘X’ from Internet Explorer */
 input[type="search"]::-ms-clear {
   display: none;
@@ -98,3 +104,38 @@ input[type="search"] {
   outline: 0;
   padding: 7px;
 }
+
+/*INCREASE THE SIZE OF THE INDICATORS (i.e the circles at the bottom of the carousel)*/
+/* ul.control-dots .dot {
+  height: 20px !important;
+  width: 20px !important;
+} */
+
+/*OVERRIDE THE DEFAULT CSS OF THE CAROUSEL, FOR THE NEXT AND PREVIOUS ARROWS*/
+
+/* INCREASE THE "next arrow's" SIZE */
+button.control-arrow.control-next::before {
+  border-bottom: 20px solid transparent !important;
+  border-top: 20px solid transparent !important;
+  border-left: 20px solid #fff !important;
+  margin-left: 20px !important;
+}
+
+/* INCREASE THE "previous arrow's" SIZE */
+button.control-arrow.control-prev::before {
+  border-bottom: 20px solid transparent !important;
+  border-top: 20px solid transparent !important;
+  border-right: 20px solid #fff !important;
+  margin-right: 20px !important;
+}
+
+/* Make the carousel's status bigger. (i.e. the status that says "1 of 3") */
+.carousel-status {
+  font-size: 15px !important;
+  font-weight: bolder !important;
+  top: -10px !important;
+}
+
+/* textarea {
+  height: 200px !important;
+} */

@@ -98,7 +98,7 @@ const HomePage = () => {
       </div>
 
       <section className="my-16">
-        <h2 className="Anton text-center text-4xl font-bold uppercase mb-8 tracking-[0.2em]">
+        <h2 className="Anton text-center text-4xl max-[360px]:text-3xl font-bold uppercase mb-8 tracking-[0.2em]">
           Trending sells
         </h2>
 

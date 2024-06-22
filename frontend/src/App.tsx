@@ -4,6 +4,8 @@ import HomePage from "./Pages/HomePage";
 import Footer from "./Pages/Footer";
 import AllItems from "./Pages/AllItems";
 import ItemDisplay from "./Pages/ItemDisplay";
+import Chat from "./Pages/Chat";
+import ChatScreen from "./Pages/ChatScreen";
 
 function App() {
   return (
@@ -13,14 +15,14 @@ function App() {
 
         <Routes>
           <Route path="/" element={<HomePage />} />
-        </Routes>
 
-        <Routes>
           <Route path="/items" element={<AllItems />} />
-        </Routes>
 
-        <Routes>
           <Route path="/item" element={<ItemDisplay />} />
+
+          <Route path="/chat" element={<Chat />} />
+
+          <Route path="/chat/1" element={<ChatScreen />} />
         </Routes>
         <Footer />
       </BrowserRouter>
