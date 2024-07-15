@@ -16,10 +16,10 @@ const HomePage = () => {
           showStatus={false}
           swipeable={false}
           useKeyboardArrows={false}
-          animationHandler="fade"
+          animationHandler="slide"
           swipeScrollTolerance={5}
           interval={6000}
-          transitionTime={3000}
+          transitionTime={500}
           stopOnHover={false}
           // centerMode={true}
           // centerSlidePercentage={93}

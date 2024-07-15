@@ -19,6 +19,11 @@
   color: white;
 }
 
+/*Stop the body from scrolling when the menu is open, on smaller screens*/
+body.menuOpen {
+  overflow: hidden;
+}
+
 #logo {
   background-color: #70dbb8;
   background-image: linear-gradient(45deg, #a1d06d, white, #ffa001);
@@ -73,12 +78,6 @@ footer#pageFooter {
   background-position: center;
 }
 
-/* #chatSketch {
-  background: url(/chatSketch.svg) no-repeat;
-  background-size: cover;
-  background-position: center;
-} */
-
 /* clears the ‘X’ from Internet Explorer */
 input[type="search"]::-ms-clear {
   display: none;
@@ -103,6 +102,16 @@ input[type="search"]::-webkit-search-results-decoration {
 input[type="search"] {
   outline: 0;
   padding: 7px;
+}
+
+/*Clears the arrow from a 'number' input type*/
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 /*INCREASE THE SIZE OF THE INDICATORS (i.e the circles at the bottom of the carousel)*/
@@ -136,6 +145,7 @@ button.control-arrow.control-prev::before {
   top: -10px !important;
 }
 
-/* textarea {
-  height: 200px !important;
-} */
+/* This reduces the placeholder that says 'currency' in the <Select> for price, on the 'Sell.tsx' page */
+#react-select-currency-placeholder {
+  font-size: 12px !important;
+}

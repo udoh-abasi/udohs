@@ -2,6 +2,8 @@ import { Carousel } from "react-responsive-carousel";
 import { Link } from "react-router-dom";
 import { IoChatboxOutline, IoLocationOutline } from "react-icons/io5";
 import { MdWorkspacePremium } from "react-icons/md";
+import { TbShoppingBagHeart } from "react-icons/tb";
+import { TbShoppingBagX } from "react-icons/tb";
 
 const ItemDisplay = () => {
   // const changeThumbWidth = () => {
@@ -15,11 +17,12 @@ const ItemDisplay = () => {
   // changeThumbWidth();
 
   const number = 9888888888.97;
+  const inBag = true;
 
   return (
     <main>
       <div className="relative">
-        <div className="min-[1120px]:grid grid-cols-[2fr_350px] grid-rows-1">
+        <div className="min-[1120px]:grid grid-cols-[minmax(2fr,auto)_350px] grid-rows-1">
           <section className="p-4 min-[600px]:grid grid-cols-2 grid-rows-1 gap-3 min-[1120px]:block col-start-2 col-end-3 row-start-1 row-end-2 min-[1120px]:sticky z-10 top-5 max-w-[855px] mx-auto my-0 h-fit">
             <article className="mb-4 p-4 rounded-2xl bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]">
               <p className="text-center font-bold text-2xl break-all mb-2">
@@ -69,7 +72,7 @@ const ItemDisplay = () => {
               <div className="flex justify-center font-bold">
                 <button
                   type="button"
-                  className="flex justify-center items-center gap-2 rounded-full ring-2 ring-white py-2 px-16 my-4 mt-6"
+                  className="flex justify-center items-center gap-2 rounded-full ring-2 ring-white py-2 px-14 my-4 mt-6"
                 >
                   {" "}
                   <IoChatboxOutline className="text-2xl" />{" "}
@@ -84,29 +87,6 @@ const ItemDisplay = () => {
               </h3>
 
               <ul className="list-outside list-disc ml-2 flex flex-col gap-2">
-                {/* <li>
-                <strong>Never make payments in advance:</strong> Always withhold
-                any payment until you have verified the item in person.
-              </li>
-              <li>
-                <strong>Arrange to meet in a secure, public location:</strong>{" "}
-                Ensure that all exchanges occur in well-populated and safe
-                areas.
-              </li>
-              <li>
-                <strong>Thoroughly examine the item before purchasing:</strong>{" "}
-                Carefully review the product to confirm it meets your
-                requirements and expectations.
-              </li>
-              <li>
-                <strong>
-                  Verify all documentation and only proceed with payment if
-                  completely satisfied:
-                </strong>
-                Check all relevant paperwork and make the payment only after you
-                are fully convinced of the item's legitimacy and condition.
-              </li> */}
-
                 <li>
                   <strong>Never make payments in advance</strong>
                 </li>
@@ -177,6 +157,27 @@ const ItemDisplay = () => {
                 {" "}
                 <IoLocationOutline /> <small>Lagos Nigeria</small>
               </p>
+
+              <div className="flex justify-between p-4 mb-3">
+                {inBag ? (
+                  <button
+                    type="button"
+                    className="text-lg rounded-lg hover:ring-2 ring-blue-500 text-blue-500 flex items-center gap-1 px-4 py-1 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+                  >
+                    <TbShoppingBagHeart className="text-2xl" />
+                    <span>Add to bag</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="text-sm rounded-lg hover:ring-2 ring-red-500 text-red-500 flex items-center gap-1 px-4 py-3 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+                  >
+                    <TbShoppingBagX className="text-2xl" />
+                    <span>Remove from bag</span>
+                  </button>
+                )}
+              </div>
+
               <p className="text-justify max-w-[600px]">
                 The description of the item Lorem ipsum dolor sit amet,
                 consectetur adipiscing elit, sed do eiusmod tempor incididunt ut

@@ -87,7 +87,7 @@ const AllItems = () => {
         </section>
       </div>
 
-      <section className="min-[600px]:grid grid-rows-1 grid-cols-[300px,auto] relative">
+      <section className="min-[600px]:grid grid-rows-1 grid-cols-[350px,auto] relative">
         <ul className="Anton text-lg tracking-widest bg-[#a1d06d] p-4 rounded-2xl m-4 min-[600px]:ml-4 min-[600px]:m-0 row-start-1 row-end-1 col-start-1 col-end-1 h-fit static min-[600px]:sticky top-10 shadow-[0px_5px_15px_rgba(0,0,0,0.35)]">
           <li>
             <button
@@ -105,7 +105,7 @@ const AllItems = () => {
               className="w-full text-left py-4 border-b-2 border-b-[#c9a998] hover:text-[black] flex items-center gap-2 uppercase"
             >
               <FaMobileScreen className="text-xl text-[black] font-bold" />
-              Mobile & Accessories
+              Mobile Phone & Accessories
             </button>
           </li>
 
@@ -161,7 +161,7 @@ const AllItems = () => {
         </ul>
 
         <div className="row-start-1 row-end-1 col-start-2 col-end-3">
-          <ul className="p-4 pt-0 min-[460px]:grid grid-cols-1 max-[600px]:grid-cols-2 min-[700px]:grid-cols-2 min-[1000px]:grid-cols-3 gap-[16px] justify-items-center">
+          <ul className="p-4 pt-0 min-[460px]:grid grid-cols-1 max-[599.9px]:grid-cols-2 min-[810px]:grid-cols-2 min-[1150px]:grid-cols-3 gap-[16px] justify-items-center">
             <li className="max-[460px]:mb-8">
               <Link
                 to=""
