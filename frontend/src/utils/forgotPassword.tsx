@@ -109,35 +109,35 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
   }, [confirmPassword, password]);
 
   // This sends an email code to verify the user's email before sign up. Returns a 403 error if the email already exists
-  const sendEmail = async (emailAddress: string) => {
-    try {
-      setRequestIsLoading(true);
-      setEmailSendingError("");
+  // const sendEmail = async (emailAddress: string) => {
+  //   try {
+  //     setRequestIsLoading(true);
+  //     setEmailSendingError("");
 
-      const response = await axiosClient.post("/api/sendemailcode", {
-        email: emailAddress,
-      });
+  //     const response = await axiosClient.post("/api/sendemailcode", {
+  //       email: emailAddress,
+  //     });
 
-      if (response.status === 200) {
-        setShowEmailField(false);
-      }
-      setRequestIsLoading(false);
-    } catch (e) {
-      setRequestIsLoading(false);
-      switch (e.request.status) {
-        case 403: {
-          setEmailSendingError(
-            "User already exists. Sign in or choose another email"
-          );
-          return;
-        }
-        default: {
-          setEmailSendingError("Something went wrong. Please try again later");
-          return;
-        }
-      }
-    }
-  };
+  //     if (response.status === 200) {
+  //       setShowEmailField(false);
+  //     }
+  //     setRequestIsLoading(false);
+  //   } catch (e) {
+  //     setRequestIsLoading(false);
+  //     switch (e.request.status) {
+  //       case 403: {
+  //         setEmailSendingError(
+  //           "User already exists. Sign in or choose another email"
+  //         );
+  //         return;
+  //       }
+  //       default: {
+  //         setEmailSendingError("Something went wrong. Please try again later");
+  //         return;
+  //       }
+  //     }
+  //   }
+  // };
 
   const confirmEmailCode = async (code: string) => {
     setRequestIsLoading(true);
@@ -285,7 +285,7 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
                     disabled={requestIsLoading}
                     onClick={() => {
                       if (isEmailValid(email)) {
-                        sendEmail(email);
+                        // sendEmail(email);
                       } else {
                         setInvalidEmail(true);
                       }
@@ -331,7 +331,7 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
                           type="button"
                           disabled={false}
                           onClick={() => {
-                            sendEmail(email);
+                            // sendEmail(email);
                             setShowEmailField(true);
                             setEmailConfirmationCode("");
                             setIncorrectCode(false);
