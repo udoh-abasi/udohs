@@ -258,7 +258,7 @@ const Sell = () => {
           ></textarea>
         </div>
 
-        <div className="mt-8 max-w-[300px]">
+        <div className="mt-8">
           <p className="text-white text-xl font-bold block">Add Photo</p>
 
           <p className="mt-3 font-bold text-black">
@@ -268,36 +268,43 @@ const Sell = () => {
             </span>
           </p>
 
-          <input
-            type="file"
-            id="addImage"
-            accept="image/*"
-            className="max-w-full hidden"
-            multiple={false}
-            value={imageOnInput}
-            onChange={(e) => {
-              // Just reset this if it is true
-              setDuplicateImage(false);
+          <p className="mt-2 text-black font-bold text-sm">
+            <span>The first photo will be used as the title photo.</span> You
+            can change the order of photos: just grab your photos and drag.
+          </p>
 
-              // Check if a file was provided, then check if the file is an image file
-              if (
-                e.target.files?.length &&
-                e.target.files[0].type.startsWith("image/")
-              ) {
-                setImageFormat(e.target.files[0].type);
-                setImageToCrop(URL.createObjectURL(e.target.files[0])); // NOTE: We set this to a string, bcoz 'react-cropper' expects the image to be a string
-                setShowImageCropperInterface(true);
-              } else {
-                console.log("Invalid file provided");
-              }
-            }}
-          />
-          <label
-            htmlFor="addImage"
-            className="flex justify-center items-center gap-2 text-xl mt-3 cursor-pointer bg-[rgba(161,208,109,.7)] hover:bg-[rgba(161,208,109,1)]  py-2 rounded-md shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
-          >
-            Add photo <IoIosAddCircle />
-          </label>
+          <div className="max-w-[300px]">
+            <input
+              type="file"
+              id="addImage"
+              accept="image/*"
+              className="max-w-full hidden"
+              multiple={false}
+              value={imageOnInput}
+              onChange={(e) => {
+                // Just reset this if it is true
+                setDuplicateImage(false);
+
+                // Check if a file was provided, then check if the file is an image file
+                if (
+                  e.target.files?.length &&
+                  e.target.files[0].type.startsWith("image/")
+                ) {
+                  setImageFormat(e.target.files[0].type);
+                  setImageToCrop(URL.createObjectURL(e.target.files[0])); // NOTE: We set this to a string, bcoz 'react-cropper' expects the image to be a string
+                  setShowImageCropperInterface(true);
+                } else {
+                  console.log("Invalid file provided");
+                }
+              }}
+            />
+            <label
+              htmlFor="addImage"
+              className="flex justify-center items-center gap-2 text-xl mt-3 cursor-pointer bg-[rgba(161,208,109,.7)] hover:bg-[rgba(161,208,109,1)]  py-2 rounded-md shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+            >
+              Add photo <IoIosAddCircle />
+            </label>
+          </div>
         </div>
 
         {showImageCropperInterface && (
@@ -331,8 +338,8 @@ const Sell = () => {
           />
         )}
 
-        <div className="mt-4 flex gap-3 flex-wrap" id="sortable">
-          <ReactSortable
+        <div className="mt-4 flex gap-3 flex-wrap">
+          <ReactSortable // NOTE: When you are in development, touching and dragging the element will NOT move them, but when you deploy the code, touching and dragging will work
             // NOTE: This takes a list of objects. Note that the objects must have an 'id', which should be unique, also, do NOT use 'index' as the id, if not 'ReactSortable' will NOT work
             list={croppedImageAndCanvas}
             // NOTE: This is set to the setState
@@ -360,7 +367,7 @@ const Sell = () => {
 
                     <button
                       type="button"
-                      className="opacity-0 hover:opacity-100 peer-hover:opacity-100 peer-focus:opacity-100 peer-focus-within:opacity-100"
+                      className="absolute top-2 left-0 bg-black opacity-0 hover:opacity-100 peer-hover:opacity-100 peer-focus:opacity-100 peer-focus-within:opacity-100"
                       aria-label="Remove Photo"
                       title="Remove Photo"
                       onClick={() => {
@@ -372,15 +379,10 @@ const Sell = () => {
                         removeImage(eachCroppedImageAndCanvas.croppedImage);
                       }}
                     >
-                      <IoIosCloseCircle className="absolute top-2 left-2 text-2xl bg-black" />
+                      <IoIosCloseCircle className="text-2xl" />
                     </button>
                   </div>
                 ))}
-
-                <p className="mt-2 text-black font-bold italic text-sm">
-                  You can change the order of photos: just grab your photos and
-                  drag
-                </p>
               </>
             ) : (
               <></>

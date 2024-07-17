@@ -20,7 +20,6 @@
     "react-select": "^5.8.0",
     "react-sortablejs": "^6.1.4",
     "react-textarea-autosize": "^8.5.3",
-    "sortablejs": "^1.15.2",
     "uuid4": "^2.0.3"
   },
   "devDependencies": {

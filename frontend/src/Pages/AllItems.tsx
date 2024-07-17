@@ -171,7 +171,7 @@ const AllItems = () => {
                   <div>
                     <img
                       alt=""
-                      src="/heroImages/Hero photo-small.webp"
+                      src="/heroImages/product 1.jpg"
                       className=" rounded-2xl"
                     />
                   </div>
@@ -199,7 +199,7 @@ const AllItems = () => {
                   <div>
                     <img
                       alt=""
-                      src="/heroImages/Hero photo-small.webp"
+                      src="/heroImages/product 1.jpg"
                       className=" rounded-2xl"
                     />
                   </div>
@@ -227,7 +227,7 @@ const AllItems = () => {
                   <div>
                     <img
                       alt=""
-                      src="/heroImages/Hero photo-small.webp"
+                      src="/heroImages/product 1.jpg"
                       className=" rounded-2xl"
                     />
                   </div>
@@ -255,7 +255,7 @@ const AllItems = () => {
                   <div>
                     <img
                       alt=""
-                      src="/heroImages/Hero photo-small.webp"
+                      src="/heroImages/product 1.jpg"
                       className=" rounded-2xl"
                     />
                   </div>
@@ -283,7 +283,7 @@ const AllItems = () => {
                   <div>
                     <img
                       alt=""
-                      src="/heroImages/Hero photo-small.webp"
+                      src="/heroImages/product 1.jpg"
                       className=" rounded-2xl"
                     />
                   </div>
@@ -311,7 +311,7 @@ const AllItems = () => {
                   <div>
                     <img
                       alt=""
-                      src="/heroImages/Hero photo-small.webp"
+                      src="/heroImages/product 1.jpg"
                       className=" rounded-2xl"
                     />
                   </div>
@@ -339,7 +339,7 @@ const AllItems = () => {
                   <div>
                     <img
                       alt=""
-                      src="/heroImages/Hero photo-small.webp"
+                      src="/heroImages/product 1.jpg"
                       className=" rounded-2xl"
                     />
                   </div>
@@ -367,7 +367,7 @@ const AllItems = () => {
                   <div>
                     <img
                       alt=""
-                      src="/heroImages/Hero photo-small.webp"
+                      src="/heroImages/product 1.jpg"
                       className=" rounded-2xl"
                     />
                   </div>
@@ -395,7 +395,7 @@ const AllItems = () => {
                   <div>
                     <img
                       alt=""
-                      src="/heroImages/Hero photo-small.webp"
+                      src="/heroImages/product 1.jpg"
                       className=" rounded-2xl"
                     />
                   </div>

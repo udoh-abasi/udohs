@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { IoChatboxOutline } from "react-icons/io5";
 import { FaBagShopping } from "react-icons/fa6";
+import EditProfile from "../utils/editProfile";
+import { hideForm, showForm } from "../utils/showOrHideSignUpAndRegisterForms";
 
 const UserProfile = () => {
   return (
@@ -13,7 +15,7 @@ const UserProfile = () => {
             <div className="my-4 flex justify-center">
               <figure>
                 <div className="relative">
-                  <div className="rounded-full overflow-hidden mx-auto w-[120px] h-[120px]">
+                  <div className="rounded-full overflow-hidden mx-auto w-[120px] h-[120px] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]">
                     <img
                       alt={``}
                       src={`/Profile_Image_Placeholder-small.jpg`}
@@ -53,6 +55,7 @@ const UserProfile = () => {
             <div className="flex justify-center font-bold">
               <button
                 type="button"
+                onClick={() => showForm("#editProfile")}
                 className="flex justify-center items-center gap-2 rounded-full ring-2 ring-blue-500 text-blue-500 uppercase py-2 px-16 my-4 mt-6"
               >
                 {" "}
@@ -289,6 +292,14 @@ const UserProfile = () => {
           </ul>
         </section>
       </div>
+
+      <section
+        id="editProfile"
+        className="bg-[rgba(0,0,0,.7)] fixed z-50 top-[1200px] left-0 w-full h-full hidden transition-all duration-500 ease-in-out"
+        onClick={() => hideForm("#editProfile")}
+      >
+        <EditProfile />
+      </section>
     </main>
   );
 };
