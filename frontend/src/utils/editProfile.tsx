@@ -55,6 +55,9 @@ const EditProfile = () => {
           onSubmit={(e) => {
             e.preventDefault();
 
+            setEditProfileError(false);
+            setEditProfileLoading(false);
+
             // editProfile();
           }}
         >

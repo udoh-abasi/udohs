@@ -5,6 +5,7 @@ import {
   selectOptions,
   theServerResponse,
 } from "./tsInterface";
+import { backendURL } from "./axiosSetup";
 
 const CountryAndState: React.FC<CountryAndStateProps> = ({
   setParentCountry,
@@ -33,9 +34,8 @@ const CountryAndState: React.FC<CountryAndStateProps> = ({
   const [stateOptions, setStateOptions] = useState<selectOptions[] | []>([]);
 
   // Set up the URL where requests will be sent to
-  const getCountryURL =
-    "http://localhost:8000/api/getCountryStateCities/country";
-  const getStateURL = `http://localhost:8000/api/getCountryStateCities/getStateByCountry/${countryCode}`;
+  const getCountryURL = `${backendURL}/api/getCountryStateCities/country`;
+  const getStateURL = `${backendURL}/api/getCountryStateCities/getStateByCountry/${countryCode}`;
 
   // This is the fetch() function, we will use to send all two requests (for country and state)
   const fetchData = async (
@@ -65,7 +65,7 @@ const CountryAndState: React.FC<CountryAndStateProps> = ({
   // On first load, this will run, and send a request to get all the countries in the world, and populate the select field
   useEffect(() => {
     fetchData(getCountryURL, setCountry, setCountryIsLoading);
-  }, []);
+  }, [getCountryURL]);
 
   // When we get the country data, these useEffect will run and populate the <options> of the country's <Select />
   useEffect(() => {
@@ -130,7 +130,7 @@ const CountryAndState: React.FC<CountryAndStateProps> = ({
         />
       </div>
 
-      <div className="dark:text-black mb-4">
+      <div className="text-black mb-4">
         <Select
           id="selectboxForState"
           instanceId="selectboxForState"

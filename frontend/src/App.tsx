@@ -8,6 +8,7 @@ import Chat from "./Pages/Chat";
 import ChatScreen from "./Pages/ChatScreen";
 import UserProfile from "./Pages/UserProfile";
 import Sell from "./Pages/Sell";
+import Bag from "./Pages/Bag";
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
           <Route path="/user" element={<UserProfile />} />
 
           <Route path="/sell" element={<Sell />} />
+
+          <Route path="/bag" element={<Bag />} />
         </Routes>
         <Footer />
       </BrowserRouter>
