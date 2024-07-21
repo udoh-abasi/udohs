@@ -105,35 +105,48 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
   }, [confirmPassword, password]);
 
   // This sends an email code to verify the user's email before sign up. Returns a 403 error if the email already exists
-  // const sendEmail = async (emailAddress: string) => {
-  //   try {
-  //     setRequestIsLoading(true);
-  //     setEmailSendingError("");
+  const sendEmail = async (emailAddress: string) => {
+    try {
+      setRequestIsLoading(true);
+      setEmailSendingError("");
 
-  //     const response = await axiosClient.post("/api/sendemailcode", {
-  //       email: emailAddress,
-  //     });
+      const response = await axiosClient.post("/api/sendsignupmail", {
+        email: emailAddress,
+      });
 
-  //     if (response.status === 200) {
-  //       setShowEmailField(false);
-  //     }
-  //     setRequestIsLoading(false);
-  //   } catch (e) {
-  //     setRequestIsLoading(false);
-  //     switch (e.request.status) {
-  //       case 403: {
-  //         setEmailSendingError(
-  //           "User already exists. Sign in or choose another email"
-  //         );
-  //         return;
-  //       }
-  //       default: {
-  //         setEmailSendingError("Something went wrong. Please try again later");
-  //         return;
-  //       }
-  //     }
-  //   }
-  // };
+      if (response.status === 200) {
+        setShowEmailField(false);
+      }
+      setRequestIsLoading(false);
+    } catch (e) {
+      setRequestIsLoading(false);
+      if (
+        // NOTE: If we do not do this 'narrowing of type', we will get an error that 'e is unknown'
+        typeof e === "object" &&
+        e &&
+        "request" in e &&
+        typeof e.request == "object" &&
+        e.request &&
+        "status" in e.request &&
+        typeof e.request.status === "number"
+      ) {
+        switch (e.request.status) {
+          case 403: {
+            setEmailSendingError(
+              "User already exists. Sign in or choose another email"
+            );
+            return;
+          }
+          default: {
+            setEmailSendingError(
+              "Something went wrong. Please try again later"
+            );
+            return;
+          }
+        }
+      }
+    }
+  };
 
   const confirmEmailCode = async (code: string) => {
     setRequestIsLoading(true);
@@ -245,12 +258,12 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
                     setInvalidEmail(false);
                     setEmailSendingError("");
                   }}
-                  className="h-10 rounded-xl p-1 peer shadow-[0px_5px_15px_rgba(0,0,0,0.35)] disabled:cursor-not-allowed disabled:bg-gray-600 disabled:ring-gray-600 disabled:text-gray-400"
+                  className="the h-10 rounded-xl p-1 peer shadow-[0px_5px_15px_rgba(0,0,0,0.35)] disabled:cursor-not-allowed disabled:!bg-gray-600 disabled:!ring-gray-600 disabled:!text-gray-400"
                 />
 
                 <label
                   htmlFor="signUpEmail"
-                  className="cursor-text font-bold text-lg p-1 absolute peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-[50%] peer-placeholder-shown:translate-y-[-50%] peer-focus:text-black peer-focus:top-[-90%] peer-focus:translate-y-[0] top-[-90%] transition-all duration-500 ease-linear"
+                  className="the cursor-text font-bold text-lg p-1 absolute peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-[50%] peer-placeholder-shown:translate-y-[-50%] peer-focus:text-black peer-focus:top-[-90%] peer-focus:translate-y-[0] top-[-90%] transition-all duration-500 ease-linear"
                 >
                   Email&nbsp;<span className="text-red-500">&#42;</span>
                 </label>
@@ -276,8 +289,8 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
                 type="submit"
                 disabled={requestIsLoading}
                 onClick={() => {
-                  if (isEmailValid(signUpEmail)) {
-                    // sendEmail(signUpEmail);
+                  if (isEmailValid(signUpEmail) && !requestIsLoading) {
+                    sendEmail(signUpEmail);
                   } else {
                     setInvalidEmail(true);
                   }
@@ -323,7 +336,6 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
                       type="button"
                       disabled={false}
                       onClick={() => {
-                        // sendEmail(signUpEmail);
                         setShowEmailField(true);
                         setEmailConfirmationCode("");
                         setIncorrectCode(false);
@@ -334,7 +346,7 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
                       <span className="absolute inset-0 w-full h-full bg-[#70dbb8] rounded-md "></span>
                       <span className="absolute inset-0 w-full h-full transition-all duration-200 ease-in-out delay-100 bg-white rounded-md opacity-0 group-hover:opacity-100 "></span>
                       <span className="relative text-black transition-colors duration-200 ease-in-out delay-100 group-hover:text-black flex items-center">
-                        Resend Code
+                        <>Resend Code</>
                       </span>
                     </button>
                   </div>
@@ -386,7 +398,10 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
                     disabled={requestIsLoading}
                     onClick={() => {
                       setIncorrectCode(false);
-                      if (emailConfirmationCode.length === 6) {
+                      if (
+                        emailConfirmationCode.length === 6 &&
+                        !requestIsLoading
+                      ) {
                         confirmEmailCode(emailConfirmationCode);
                       } else {
                         setIncorrectCode(true);

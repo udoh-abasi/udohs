@@ -2,7 +2,10 @@ import express from "express";
 import cors from "cors";
 import { config } from "dotenv";
 import countryStateRouter from "./routers/CountryAndStateRoute";
+import sendSignUpMailRouter from "./routers/sendSignUpMailRoute";
+import confirmMailRouter from "./routers/confirmEmailRoute";
 import { connectToMongo } from "./utils/mongoDBClient";
+import createCollections from "./utils/createCollections";
 
 config(); // Load .env file
 
@@ -16,12 +19,21 @@ const corsOptions = {
 
 app.use(cors(corsOptions)); // NOTE: Here, we set up cors.
 
+app.use(express.json());
+
 // NOTE: This is the route to get all the countries and states
 app.use("/api/getCountryStateCities", countryStateRouter);
 
-// Connect to mongodb, and if successful, start the app
+// Set up all the routes to be mounted on '/api'
+app.use("/api", [sendSignUpMailRouter, confirmMailRouter]);
+
+// Connect to mongodb, and if successful, create collections and start the app
 connectToMongo()
-  .then(() => {
+  .then(async () => {
+    // Create all the collections needed in the database
+    await createCollections();
+
+    // Start the app
     app.listen(process.env.PORT, () => {
       console.log("Server is listening on port", process.env.PORT);
     });
