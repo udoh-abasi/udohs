@@ -17,12 +17,12 @@ export const GetCountry = async (req: Request, res: Response) => {
     if (response.ok) {
       const data = await response.json();
 
-      res.status(200).json({ data });
+      return res.status(200).json({ data });
     } else {
-      res.status(404).json({ message: "An error occurred" });
+      return res.status(404).json({ message: "An error occurred" });
     }
   } catch (e) {
-    res.status(404).json({ message: "An error occurred" });
+    return res.status(404).json({ message: "An error occurred" });
   }
 };
 
@@ -46,11 +46,11 @@ export const GetStateByCountry = async (req: Request, res: Response) => {
     if (response.ok) {
       const data = await response.json();
 
-      res.status(200).json({ data });
+      return res.status(200).json({ data });
     } else {
-      res.status(404).json({ message: "An error occurred" });
+      return res.status(404).json({ message: "An error occurred" });
     }
   } catch (e) {
-    res.status(404).json({ message: "An error occurred" });
+    return res.status(404).json({ message: "An error occurred" });
   }
 };

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { SendSignUpMail } from "../controllers/sendSignUpMailController";
+import SendSignUpMail from "../controllers/sendSignUpMailController";
 
 const router = Router();
 

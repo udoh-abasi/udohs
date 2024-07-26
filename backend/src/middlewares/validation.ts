@@ -1,0 +1,19 @@
+import { body } from "express-validator";
+
+export const validateEmail = body("email")
+  .trim()
+  .notEmpty()
+  .escape() // Clean the data. (Changes html or scripts to string, to prevent XSS injection attacks)
+  .isEmail()
+  .normalizeEmail()
+  .withMessage("Please enter a valid email address.");
+
+export const validatePassword = body("password")
+  .trim()
+  .notEmpty()
+  .escape()
+  .isLength({ min: 8 })
+  .custom((value, { req }) => {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/.test(value); // Returns true if the password meets the regex criteria, else it returns false
+  })
+  .withMessage("Password is invalid");

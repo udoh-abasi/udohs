@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { AiFillEye, AiFillEyeInvisible, AiFillWarning } from "react-icons/ai";
 import { FaRegWindowClose } from "react-icons/fa";
 import { HiOutlineLogin } from "react-icons/hi";
 import { signInProps } from "../utils/tsInterface";
+import Loader from "./loader";
+import axiosClient from "./axiosSetup";
 
 const Sign_In: React.FC<signInProps> = ({
   hideSignInForm,
@@ -12,6 +14,71 @@ const Sign_In: React.FC<signInProps> = ({
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const [signInError, setSignInError] = useState("");
+
+  const [signInLoading, setSignInLoading] = useState(false);
+
+  const signIn = async () => {
+    try {
+      setSignInError("");
+      setSignInLoading(true);
+      const response = await axiosClient.post("/api/signin", {
+        email: signInEmail,
+        password: signInPassword,
+      });
+
+      console.log(response.data);
+
+      // if (response.status === 200) {
+      //   const response = await axiosClient.get("/api/user");
+      //   if (response.status === 200) {
+      //     // dispatch(userAction({ userLoading: false, userData: response.data }));
+      //   }
+
+      //   hideSignInForm();
+      //   setSignInEmail("");
+      //   setSignInPassword("");
+      // } else {
+      //   throw new Error("Something went wrong");
+      // }
+
+      setSignInEmail("");
+      setSignInPassword("");
+      setSignInLoading(false);
+    } catch (e) {
+      setSignInLoading(false);
+      if (
+        // NOTE: If we do not do this 'narrowing of type', we will get an error that 'e is unknown'
+        typeof e === "object" &&
+        e &&
+        "request" in e &&
+        typeof e.request == "object" &&
+        e.request &&
+        "status" in e.request &&
+        typeof e.request.status === "number"
+      ) {
+        switch (e.request.status) {
+          case 401: {
+            setSignInError("User not found. Email or password is incorrect");
+            return;
+          }
+
+          case 404: {
+            setSignInError("User not found. Email or password is incorrect");
+            return;
+          }
+
+          default: {
+            setSignInError(
+              "Something went wrong with your sign in. Please try again"
+            );
+            return;
+          }
+        }
+      }
+    }
+  };
 
   return (
     <div className="grid place-items-center h-screen overflow-auto">
@@ -26,6 +93,9 @@ const Sign_In: React.FC<signInProps> = ({
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            if (!signInLoading) {
+              signIn();
+            }
           }}
           className="mt-8"
         >
@@ -90,6 +160,7 @@ const Sign_In: React.FC<signInProps> = ({
 
           <button
             type="submit"
+            disabled={signInLoading}
             className="w-full font-bold uppercase relative flex items-center justify-center px-6 py-3 text-lg tracking-tighter text-white bg-gray-800 rounded-md group disabled:cursor-not-allowed"
           >
             <span className="absolute inset-0 w-full h-full mt-1 ml-1 transition-all duration-300 ease-in-out bg-black rounded-md group-hover:mt-0 group-hover:ml-0"></span>
@@ -97,10 +168,23 @@ const Sign_In: React.FC<signInProps> = ({
             <span className="absolute inset-0 w-full h-full transition-all duration-200 ease-in-out delay-100 bg-black rounded-md opacity-0 group-hover:opacity-100 "></span>
             <span className="relative text-black transition-colors duration-200 ease-in-out delay-100 group-hover:text-white flex items-center">
               <>
-                Sign in <HiOutlineLogin className="ml-2" />
+                {signInLoading ? (
+                  <Loader />
+                ) : (
+                  <>
+                    Sign in <HiOutlineLogin className="ml-2" />
+                  </>
+                )}
               </>
             </span>
           </button>
+
+          {signInError && (
+            <p className="text-red-500 text-sm text-center mt-4">
+              <AiFillWarning className="inline text-lg mr-1" />
+              {signInError}
+            </p>
+          )}
         </form>
 
         <div className="mt-6 text-center text-black text-lg">

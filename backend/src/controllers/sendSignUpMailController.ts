@@ -7,7 +7,7 @@ import {
 } from "../utils/tsInterface";
 import getSixRandomNumbers from "../utils/getSixRandomNumbers";
 
-export const SendSignUpMail = async (req: Request, res: Response) => {
+const SendSignUpMail = async (req: Request, res: Response) => {
   try {
     // Get the email from the body
     const { email } = req.body;
@@ -46,7 +46,7 @@ export const SendSignUpMail = async (req: Request, res: Response) => {
                 email, // The filter to find the document we want to update
               },
 
-              { $set: { code } }, // Set the 'code' field to the same code sent to the user's email
+              { $set: { code, isVerified: false } }, // Set the 'code' field to the same code sent to the user's email
 
               {
                 upsert: true, // If no document matches the filter, this will create a new document
@@ -55,25 +55,29 @@ export const SendSignUpMail = async (req: Request, res: Response) => {
 
             // NOTE: 'result.acknowledged' will be true if everything went well and the document was successfully updated
             if (result.acknowledged) {
-              res.status(200).json({ DOne: true });
+              return res.status(200).json({ DOne: true });
             } else {
-              res.status(404).json({ message: "An error occurred" });
+              return res.status(404).json({ message: "An error occurred" });
             }
           })
           .catch((e) => {
-            res
+            return res
               .status(404)
               .json({ message: "There was an error sending the mail" });
           });
       } else {
-        res
+        return res
           .status(403)
           .json({ message: "A user with that email already exist" });
       }
     } else {
-      res.status(404).json({ message: "There was an error sending the mail" });
+      return res
+        .status(404)
+        .json({ message: "There was an error sending the mail" });
     }
   } catch {
-    res.status(404).json({ message: "An error occurred" });
+    return res.status(404).json({ message: "An error occurred" });
   }
 };
+
+export default SendSignUpMail;

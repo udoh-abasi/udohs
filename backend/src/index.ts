@@ -4,8 +4,14 @@ import { config } from "dotenv";
 import countryStateRouter from "./routers/CountryAndStateRoute";
 import sendSignUpMailRouter from "./routers/sendSignUpMailRoute";
 import confirmMailRouter from "./routers/confirmEmailRoute";
+import signUpRouter from "./routers/signUpRoute";
+import signInRouter from "./routers/signInRoute";
 import { connectToMongo } from "./utils/mongoDBClient";
 import createCollections from "./utils/createCollections";
+import cookieParser from "cookie-parser";
+
+import session from "express-session";
+import passportSetUp from "./middlewares/passportSetUp";
 
 config(); // Load .env file
 
@@ -19,13 +25,40 @@ const corsOptions = {
 
 app.use(cors(corsOptions)); // NOTE: Here, we set up cors.
 
-app.use(express.json());
+app.use(express.json()); // Enables getting data from 'req.body'
+
+// Initialize session management with cookie-session
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET as string,
+    name: "sessionID",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true },
+  })
+);
+
+app.use(cookieParser()); // NOTE: This gives us req.cookies
+
+// Set up passport
+const passport = passportSetUp();
+
+// Initialize passport
+app.use(passport.initialize());
+
+// Passport to use sessions
+app.use(passport.session());
 
 // NOTE: This is the route to get all the countries and states
 app.use("/api/getCountryStateCities", countryStateRouter);
 
 // Set up all the routes to be mounted on '/api'
-app.use("/api", [sendSignUpMailRouter, confirmMailRouter]);
+app.use("/api", [
+  sendSignUpMailRouter,
+  confirmMailRouter,
+  signUpRouter,
+  signInRouter,
+]);
 
 // Connect to mongodb, and if successful, create collections and start the app
 connectToMongo()

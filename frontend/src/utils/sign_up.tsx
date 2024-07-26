@@ -107,17 +107,19 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
   // This sends an email code to verify the user's email before sign up. Returns a 403 error if the email already exists
   const sendEmail = async (emailAddress: string) => {
     try {
-      setRequestIsLoading(true);
-      setEmailSendingError("");
+      if (emailAddress.trim()) {
+        setRequestIsLoading(true);
+        setEmailSendingError("");
 
-      const response = await axiosClient.post("/api/sendsignupmail", {
-        email: emailAddress,
-      });
+        const response = await axiosClient.post("/api/sendsignupmail", {
+          email: emailAddress,
+        });
 
-      if (response.status === 200) {
-        setShowEmailField(false);
+        if (response.status === 200) {
+          setShowEmailField(false);
+        }
+        setRequestIsLoading(false);
       }
-      setRequestIsLoading(false);
     } catch (e) {
       setRequestIsLoading(false);
       if (
@@ -152,14 +154,16 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
     setRequestIsLoading(true);
 
     try {
-      const response = await axiosClient.post("api/confirmemail", {
-        email: signUpEmail,
-        code: code,
-      });
-      if (response.status === 200) {
-        setEmailVerified(true);
+      if (signUpEmail.trim() && code.trim()) {
+        const response = await axiosClient.post("api/confirmemail", {
+          email: signUpEmail,
+          code: code,
+        });
+        if (response.status === 200) {
+          setEmailVerified(true);
+        }
+        setRequestIsLoading(false);
       }
-      setRequestIsLoading(false);
     } catch {
       setIncorrectCode(true);
       setRequestIsLoading(false);
@@ -174,55 +178,63 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
       passwordHasNumber &&
       passwordIsEightDigit &&
       passwordMatch &&
-      signUpEmail
+      signUpEmail.trim() &&
+      fullName.trim() &&
+      phoneNumber.trim() &&
+      emailConfirmationCode.trim()
     ) {
       setRequestIsLoading(true);
       setSignUpError("");
 
       try {
-        const response = await axiosClient.post("/api/register", {
+        const response = await axiosClient.post("/api/signup", {
           email,
           password,
+          fullName,
+          phoneNumber,
+          emailConfirmationCode,
         });
 
-        if (response.status === 201) {
-          const response = await axiosClient.post("/api/login", {
-            email,
-            password,
-          });
+        // if (response.status === 201) {
+        //   const response = await axiosClient.post("/api/login", {
+        //     email,
+        //     password,
+        //   });
 
-          if (response.status === 200) {
-            const response = await axiosClient.get("/api/user");
-            if (response.status === 200) {
-              // dispatch(
-              //   userAction({ userLoading: false, userData: response.data })
-              // );
-            }
+        if (response.status === 200) {
+          // const response = await axiosClient.get("/api/user");
+          // if (response.status === 200) {
+          //   // dispatch(
+          //   //   userAction({ userLoading: false, userData: response.data })
+          //   // );
+          // }
 
-            // Then reset everything back to default
-            setSignUpEmail("");
-            setPassword("");
-            setConfirmPassword("");
-            setEmailConfirmationCode("");
-            setSignUpError("");
+          // Then reset everything back to default
+          setSignUpEmail("");
+          setPassword("");
+          setConfirmPassword("");
+          setFullName("");
+          setPhoneNumber("");
+          setEmailConfirmationCode("");
+          setSignUpError("");
 
-            setEmailVerified(false);
-            setShowEmailField(true);
+          setEmailVerified(false);
+          setShowEmailField(true);
 
-            setPasswordHasCharacter(false);
-            setPasswordHasLowercase(false);
-            setPasswordHasNumber(false);
-            setPasswordHasUppercase(false);
-            setPasswordIsEightDigit(false);
+          setPasswordHasCharacter(false);
+          setPasswordHasLowercase(false);
+          setPasswordHasNumber(false);
+          setPasswordHasUppercase(false);
+          setPasswordIsEightDigit(false);
 
-            setRequestIsLoading(false);
-            // hideRegisterForm();
-          } else {
-            throw new Error("Something went wrong");
-          }
+          setRequestIsLoading(false);
+          hideSignUpForm();
         } else {
           throw new Error("Something went wrong");
         }
+        // } else {
+        //   throw new Error("Something went wrong");
+        // }
       } catch (e) {
         setRequestIsLoading(false);
         setSignUpError("Something went wrong with your registration.");

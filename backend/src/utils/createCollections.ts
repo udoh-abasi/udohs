@@ -19,6 +19,11 @@ const createCollections = async () => {
               bsonType: "string", // Code field should be a string also
               description: "'code' must be a string and is required",
             },
+
+            isVerified: {
+              bsonType: "bool", // Code field should be a string also
+              description: "'isVerified' must be a boolean and is required",
+            },
           },
         },
       },
