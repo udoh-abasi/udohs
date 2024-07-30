@@ -69,3 +69,14 @@ export interface ImageCropperProps {
   desiredWidth: number;
   desiredHeight: number;
 }
+
+// This is the user interface
+export interface User {
+  _id?: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+  fullName: string;
+  dateJoined: Date;
+  profilePicture?: string | null;
+}

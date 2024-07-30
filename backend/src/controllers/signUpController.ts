@@ -6,6 +6,7 @@ import {
 } from "../utils/tsInterface";
 import { validationResult } from "express-validator";
 import bcrypt from "bcrypt";
+import { signInUserFunction } from "./signInController";
 
 const SignUp = async (req: Request, res: Response) => {
   try {
@@ -48,8 +49,10 @@ const SignUp = async (req: Request, res: Response) => {
         const usersCollection =
           udohsDatabase.collection<UserCollection>("users");
 
+        // Get the current date and time
         const now = new Date();
 
+        // If a new user was inserted successfully, then 'result.acknowledged' will be true
         const result = await usersCollection.insertOne({
           dateJoined: now,
           password: hashPassword,
@@ -60,7 +63,8 @@ const SignUp = async (req: Request, res: Response) => {
         });
 
         if (result.acknowledged) {
-          return res.status(201).json({ Created: true });
+          // Call the sign in function to sign in the user
+          return await signInUserFunction(req, res, result.insertedId);
         } else {
           return res.status(404).json({ message: "An error occurred" });
         }

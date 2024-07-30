@@ -13,8 +13,12 @@ import { IoIosCheckmark, IoIosCheckmarkCircle } from "react-icons/io";
 import { HiOutlineLogin } from "react-icons/hi";
 import { FaRegWindowClose } from "react-icons/fa";
 import { signUpProps } from "../utils/tsInterface";
+import { userAction } from "../reduxFiles/actions";
+import { useDispatch } from "react-redux";
 
 const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
+  const dispatch = useDispatch();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm_password, setShowConfirm_password] = useState(false);
 
@@ -195,19 +199,8 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
           emailConfirmationCode,
         });
 
-        // if (response.status === 201) {
-        //   const response = await axiosClient.post("/api/login", {
-        //     email,
-        //     password,
-        //   });
-
         if (response.status === 200) {
-          // const response = await axiosClient.get("/api/user");
-          // if (response.status === 200) {
-          //   // dispatch(
-          //   //   userAction({ userLoading: false, userData: response.data })
-          //   // );
-          // }
+          dispatch(userAction({ userLoading: false, userData: response.data }));
 
           // Then reset everything back to default
           setSignUpEmail("");
@@ -232,9 +225,6 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
         } else {
           throw new Error("Something went wrong");
         }
-        // } else {
-        //   throw new Error("Something went wrong");
-        // }
       } catch (e) {
         setRequestIsLoading(false);
         setSignUpError("Something went wrong with your registration.");

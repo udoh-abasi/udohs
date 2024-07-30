@@ -6,6 +6,8 @@ import sendSignUpMailRouter from "./routers/sendSignUpMailRoute";
 import confirmMailRouter from "./routers/confirmEmailRoute";
 import signUpRouter from "./routers/signUpRoute";
 import signInRouter from "./routers/signInRoute";
+import getUserRouter from "./routers/userRoute";
+import logoutRouter from "./routers/logoutRoute";
 import { connectToMongo } from "./utils/mongoDBClient";
 import createCollections from "./utils/createCollections";
 import cookieParser from "cookie-parser";
@@ -38,7 +40,7 @@ app.use(
   })
 );
 
-app.use(cookieParser()); // NOTE: This gives us req.cookies
+app.use(cookieParser()); // NOTE: This gives us the headers in req.cookies
 
 // Set up passport
 const passport = passportSetUp();
@@ -58,6 +60,8 @@ app.use("/api", [
   confirmMailRouter,
   signUpRouter,
   signInRouter,
+  getUserRouter,
+  logoutRouter,
 ]);
 
 // Connect to mongodb, and if successful, create collections and start the app

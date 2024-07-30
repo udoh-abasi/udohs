@@ -1,12 +1,40 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaUserPlus } from "react-icons/fa";
 import { hideForm, showForm } from "./showOrHideSignUpAndRegisterForms";
 import Forgot_Password from "./forgotPassword";
 import Sign_Up from "./sign_up";
 import Sign_In from "./sign_in";
+import { useEffect } from "react";
+import axiosClient from "./axiosSetup";
+import { useDispatch, useSelector } from "react-redux";
+import { userSelector } from "../reduxFiles/selectors";
+import { userAction } from "../reduxFiles/actions";
 
 const Header = () => {
-  const user = false;
+  const user = useSelector(userSelector);
+
+  const dispatch = useDispatch();
+
+  // Use to check when a user navigates to a new page.
+  // So, we want to fetch the user, anytime the user switched pages, to be sure the user is still logged in
+  const navigate = useNavigate();
+
+  // This useEffect fetches the user
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const response = await axiosClient.get("/api/getuser");
+        if (response.status === 200) {
+          dispatch(userAction({ userLoading: false, userData: response.data }));
+        }
+      } catch {
+        /* User's jwt token was not available in cookie, or the user signed out */
+        dispatch(userAction({ userLoading: false, userData: null }));
+      }
+    };
+
+    getUser();
+  }, [dispatch, navigate]);
 
   return (
     <header className="p-4">
@@ -44,7 +72,7 @@ const Header = () => {
           </li>
 
           <div className="flex flex-col gap-4 min-[550px]:flex-row">
-            {user ? (
+            {user.userData ? (
               <li className="relative">
                 <button type="button" className="peer">
                   <FaUserPlus className="text-5xl text-green-700" />
@@ -68,10 +96,25 @@ const Header = () => {
 
                   <li>
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         // NOTE: We did it like this to avoid errors because there are some elements (like svg) that do not have ".blur()"
                         if (document.activeElement instanceof HTMLElement) {
                           document.activeElement.blur();
+                        }
+
+                        try {
+                          const response = await axiosClient.post(
+                            "/api/logout"
+                          );
+                          if (response.status === 200) {
+                            dispatch(
+                              userAction({ userLoading: false, userData: null })
+                            );
+
+                            navigate("/");
+                          }
+                        } catch {
+                          //
                         }
                       }}
                       type="button"

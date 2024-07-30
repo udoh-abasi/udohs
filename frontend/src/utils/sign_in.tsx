@@ -5,6 +5,8 @@ import { HiOutlineLogin } from "react-icons/hi";
 import { signInProps } from "../utils/tsInterface";
 import Loader from "./loader";
 import axiosClient from "./axiosSetup";
+import { userAction } from "../reduxFiles/actions";
+import { useDispatch } from "react-redux";
 
 const Sign_In: React.FC<signInProps> = ({
   hideSignInForm,
@@ -19,6 +21,8 @@ const Sign_In: React.FC<signInProps> = ({
 
   const [signInLoading, setSignInLoading] = useState(false);
 
+  const dispatch = useDispatch();
+
   const signIn = async () => {
     try {
       setSignInError("");
@@ -28,24 +32,16 @@ const Sign_In: React.FC<signInProps> = ({
         password: signInPassword,
       });
 
-      console.log(response.data);
+      if (response.status === 200) {
+        dispatch(userAction({ userLoading: false, userData: response.data }));
 
-      // if (response.status === 200) {
-      //   const response = await axiosClient.get("/api/user");
-      //   if (response.status === 200) {
-      //     // dispatch(userAction({ userLoading: false, userData: response.data }));
-      //   }
-
-      //   hideSignInForm();
-      //   setSignInEmail("");
-      //   setSignInPassword("");
-      // } else {
-      //   throw new Error("Something went wrong");
-      // }
-
-      setSignInEmail("");
-      setSignInPassword("");
-      setSignInLoading(false);
+        hideSignInForm();
+        setSignInEmail("");
+        setSignInPassword("");
+        setSignInLoading(false);
+      } else {
+        throw new Error("Something went wrong");
+      }
     } catch (e) {
       setSignInLoading(false);
       if (
