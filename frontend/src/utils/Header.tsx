@@ -111,10 +111,11 @@ const Header = () => {
                               userAction({ userLoading: false, userData: null })
                             );
 
+                            // Take the user to the homepage
                             navigate("/");
                           }
                         } catch {
-                          //
+                          // Do nothing
                         }
                       }}
                       type="button"

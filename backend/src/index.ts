@@ -8,6 +8,8 @@ import signUpRouter from "./routers/signUpRoute";
 import signInRouter from "./routers/signInRoute";
 import getUserRouter from "./routers/userRoute";
 import logoutRouter from "./routers/logoutRoute";
+import forgotPasswordMailRouter from "./routers/sendForgotPasswordMailRoute";
+import forgotPasswordRouter from "./routers/forgotPasswordRoute";
 import { connectToMongo } from "./utils/mongoDBClient";
 import createCollections from "./utils/createCollections";
 import cookieParser from "cookie-parser";
@@ -62,6 +64,8 @@ app.use("/api", [
   signInRouter,
   getUserRouter,
   logoutRouter,
+  forgotPasswordMailRouter,
+  forgotPasswordRouter,
 ]);
 
 // Connect to mongodb, and if successful, create collections and start the app

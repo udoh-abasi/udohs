@@ -5,7 +5,10 @@ export const validateEmail = body("email")
   .notEmpty()
   .escape() // Clean the data. (Changes html or scripts to string, to prevent XSS injection attacks)
   .isEmail()
-  .normalizeEmail()
+  .normalizeEmail({
+    gmail_remove_dots: false, // By default, any dot in an email will be removed. This prevents that
+    gmail_remove_subaddress: false, // This was added so that in emails like 'udoh+test@gmail.com', the '+test' will be preserved. If not it will be removed
+  })
   .withMessage("Please enter a valid email address.");
 
 export const validatePassword = body("password")

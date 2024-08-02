@@ -34,6 +34,12 @@ export interface CountryAndStateProps {
   setParentState: (state: string) => void;
 }
 
+// This is used on the 'signUpWithGoogle.tsx' to define the props
+export interface SignUpWithGoogleProps {
+  text: string;
+  // resetPasswordFields: any;
+}
+
 // This is used on the 'sign_up.tsx' to define the props
 export interface signUpProps {
   hideSignUpForm: () => void;

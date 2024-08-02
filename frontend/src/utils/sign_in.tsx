@@ -7,6 +7,7 @@ import Loader from "./loader";
 import axiosClient from "./axiosSetup";
 import { userAction } from "../reduxFiles/actions";
 import { useDispatch } from "react-redux";
+import SignUpWithGoogle from "./signupWithGoogle";
 
 const Sign_In: React.FC<signInProps> = ({
   hideSignInForm,
@@ -196,6 +197,8 @@ const Sign_In: React.FC<signInProps> = ({
             <span className="font-bold">Register</span>
           </button>
         </div>
+
+        <SignUpWithGoogle text={"Sign in with Google"} />
 
         <button
           type="button"

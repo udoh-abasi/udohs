@@ -15,6 +15,7 @@ import { FaRegWindowClose } from "react-icons/fa";
 import { signUpProps } from "../utils/tsInterface";
 import { userAction } from "../reduxFiles/actions";
 import { useDispatch } from "react-redux";
+import SignUpWithGoogle from "./signupWithGoogle";
 
 const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
   const dispatch = useDispatch();
@@ -291,8 +292,11 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
                 type="submit"
                 disabled={requestIsLoading}
                 onClick={() => {
-                  if (isEmailValid(signUpEmail) && !requestIsLoading) {
-                    sendEmail(signUpEmail);
+                  // If email is valid, check if request is not loading before sending mail
+                  if (isEmailValid(signUpEmail)) {
+                    if (!requestIsLoading) {
+                      sendEmail(signUpEmail);
+                    }
                   } else {
                     setInvalidEmail(true);
                   }
@@ -691,7 +695,7 @@ const Sign_Up: React.FC<signUpProps> = ({ hideSignUpForm, showSignInForm }) => {
             </button>
           </div>
 
-          {/* <SignUpWithGoogle text={"Sign up with Google"} /> */}
+          <SignUpWithGoogle text={"Sign up with Google"} />
 
           <button
             type="button"

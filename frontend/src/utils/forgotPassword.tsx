@@ -13,6 +13,7 @@ import { IoIosCheckmark, IoIosCheckmarkCircle } from "react-icons/io";
 import { HiOutlineLogin } from "react-icons/hi";
 import { FaRegWindowClose } from "react-icons/fa";
 import { ForgotPasswordProps } from "./tsInterface";
+import SignUpWithGoogle from "./signupWithGoogle";
 
 const Forgot_Password: React.FC<ForgotPasswordProps> = ({
   hideForgotPasswordForm,
@@ -109,35 +110,46 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
   }, [confirmPassword, password]);
 
   // This sends an email code to verify the user's email before sign up. Returns a 403 error if the email already exists
-  // const sendEmail = async (emailAddress: string) => {
-  //   try {
-  //     setRequestIsLoading(true);
-  //     setEmailSendingError("");
+  const sendEmail = async (emailAddress: string) => {
+    try {
+      setRequestIsLoading(true);
+      setEmailSendingError("");
 
-  //     const response = await axiosClient.post("/api/sendemailcode", {
-  //       email: emailAddress,
-  //     });
+      const response = await axiosClient.post("/api/sendforgotpasswordmail", {
+        email: emailAddress,
+      });
 
-  //     if (response.status === 200) {
-  //       setShowEmailField(false);
-  //     }
-  //     setRequestIsLoading(false);
-  //   } catch (e) {
-  //     setRequestIsLoading(false);
-  //     switch (e.request.status) {
-  //       case 403: {
-  //         setEmailSendingError(
-  //           "User already exists. Sign in or choose another email"
-  //         );
-  //         return;
-  //       }
-  //       default: {
-  //         setEmailSendingError("Something went wrong. Please try again later");
-  //         return;
-  //       }
-  //     }
-  //   }
-  // };
+      if (response.status === 200) {
+        setShowEmailField(false);
+      }
+      setRequestIsLoading(false);
+    } catch (e) {
+      setRequestIsLoading(false);
+      if (
+        // NOTE: If we do not do this 'narrowing of type', we will get an error that 'e is unknown'
+        typeof e === "object" &&
+        e &&
+        "request" in e &&
+        typeof e.request == "object" &&
+        e.request &&
+        "status" in e.request &&
+        typeof e.request.status === "number"
+      ) {
+        switch (e.request.status) {
+          case 403: {
+            setEmailSendingError("User does not exist. Sign up instead");
+            return;
+          }
+          default: {
+            setEmailSendingError(
+              "Something went wrong. Please try again later"
+            );
+            return;
+          }
+        }
+      }
+    }
+  };
 
   const confirmEmailCode = async (code: string) => {
     setRequestIsLoading(true);
@@ -157,7 +169,11 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
     }
   };
 
-  const changePassword = async (email: string, password: string) => {
+  const changePassword = async (
+    email: string,
+    password: string,
+    emailConfirmationCode: string
+  ) => {
     if (
       passwordHasCharacter &&
       passwordHasUppercase &&
@@ -171,49 +187,34 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
       setResetPasswordError("");
 
       try {
-        const response = await axiosClient.post("/api/register", {
+        const response = await axiosClient.post("/api/changepassword", {
           email,
           password,
+          emailConfirmationCode,
         });
 
-        if (response.status === 201) {
-          const response = await axiosClient.post("/api/login", {
-            email,
-            password,
-          });
+        if (response.status === 200) {
+          setPasswordChanged(true);
 
-          if (response.status === 200) {
-            const response = await axiosClient.get("/api/user");
-            if (response.status === 200) {
-              // dispatch(
-              //   userAction({ userLoading: false, userData: response.data })
-              // );
-              setPasswordChanged(true);
-            }
+          // Then reset everything back to default
+          setEmail("");
+          setPassword("");
+          setConfirmPassword("");
+          setEmailConfirmationCode("");
+          setResetPasswordError("");
 
-            // Then reset everything back to default
-            setEmail("");
-            setPassword("");
-            setConfirmPassword("");
-            setEmailConfirmationCode("");
-            setResetPasswordError("");
+          setEmailVerified(false);
+          setShowEmailField(true);
 
-            setEmailVerified(false);
-            setShowEmailField(true);
+          setPasswordHasCharacter(false);
+          setPasswordHasLowercase(false);
+          setPasswordHasNumber(false);
+          setPasswordHasUppercase(false);
+          setPasswordIsEightDigit(false);
 
-            setPasswordHasCharacter(false);
-            setPasswordHasLowercase(false);
-            setPasswordHasNumber(false);
-            setPasswordHasUppercase(false);
-            setPasswordIsEightDigit(false);
-
-            setRequestIsLoading(false);
-            hideForgotPasswordForm();
-            setPasswordChanged(false);
-          } else {
-            throw new Error("Something went wrong");
-          }
+          setRequestIsLoading(false);
         } else {
+          // setPasswordChanged(false);
           throw new Error("Something went wrong");
         }
       } catch (e) {
@@ -284,8 +285,11 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
                     type="submit"
                     disabled={requestIsLoading}
                     onClick={() => {
+                      // If email is valid, check if request is not loading before sending mail
                       if (isEmailValid(email)) {
-                        // sendEmail(email);
+                        if (!requestIsLoading) {
+                          sendEmail(email);
+                        }
                       } else {
                         setInvalidEmail(true);
                       }
@@ -331,7 +335,6 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
                           type="button"
                           disabled={false}
                           onClick={() => {
-                            // sendEmail(email);
                             setShowEmailField(true);
                             setEmailConfirmationCode("");
                             setIncorrectCode(false);
@@ -579,7 +582,7 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
                         htmlFor="confirm_password"
                         className="cursor-text font-bold text-sm p-1 absolute peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-[50%] peer-placeholder-shown:translate-y-[-50%] peer-focus:text-black peer-focus:top-[-60%] peer-focus:translate-y-[0] top-[-60%] transition-all duration-500 ease-linear"
                       >
-                        Confirm Password&nbsp;
+                        Confirm new Password&nbsp;
                         <span className="text-red-500">&#42;</span>
                       </label>
                     </div>
@@ -603,7 +606,11 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
                       disabled={requestIsLoading}
                       onClick={() => {
                         if (password && password === confirmPassword) {
-                          changePassword(email, password);
+                          changePassword(
+                            email,
+                            password,
+                            emailConfirmationCode
+                          );
                         } else if (password && password !== confirmPassword) {
                           setPasswordMatch(false);
                         }
@@ -648,7 +655,7 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
                 </button>
               </div>
 
-              {/* <SignUpWithGoogle text={"Sign up with Google"} /> */}
+              <SignUpWithGoogle text={"Sign in with Google"} />
             </>
           )}
 
@@ -669,6 +676,7 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
                     onClick={() => {
                       hideForgotPasswordForm();
                       showSignInForm();
+                      setPasswordChanged(false);
                     }}
                     className="italic underline decoration-blue-600 decoration-2"
                   >
@@ -684,6 +692,7 @@ const Forgot_Password: React.FC<ForgotPasswordProps> = ({
                   onClick={() => {
                     hideForgotPasswordForm();
                     showSignInForm();
+                    setPasswordChanged(false);
                   }}
                   className="italic underline decoration-blue-600 decoration-2"
                 >
