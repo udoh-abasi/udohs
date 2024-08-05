@@ -10,6 +10,8 @@ import getUserRouter from "./routers/userRoute";
 import logoutRouter from "./routers/logoutRoute";
 import forgotPasswordMailRouter from "./routers/sendForgotPasswordMailRoute";
 import forgotPasswordRouter from "./routers/forgotPasswordRoute";
+import getGoogleLinkRouter from "./routers/sendGoogleLinkRoute";
+import signInWithGoogleRouter from "./routers/signInWithGoogleRoute";
 import { connectToMongo } from "./utils/mongoDBClient";
 import createCollections from "./utils/createCollections";
 import cookieParser from "cookie-parser";
@@ -66,6 +68,8 @@ app.use("/api", [
   logoutRouter,
   forgotPasswordMailRouter,
   forgotPasswordRouter,
+  getGoogleLinkRouter,
+  signInWithGoogleRouter,
 ]);
 
 // Connect to mongodb, and if successful, create collections and start the app

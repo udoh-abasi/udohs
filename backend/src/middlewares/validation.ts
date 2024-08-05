@@ -15,8 +15,8 @@ export const validatePassword = body("password")
   .trim()
   .notEmpty()
   .escape()
-  .isLength({ min: 8 })
+  .isLength({ min: 8 }) // Password must be a minimum of 8 characters
   .custom((value, { req }) => {
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/.test(value); // Returns true if the password meets the regex criteria, else it returns false
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/.test(value); // Returns true if the password meets the regex criteria, else it returns false. This regex requires at least one uppercase, one lowercase, one number, one special character and at least 8 characters
   })
   .withMessage("Password is invalid");

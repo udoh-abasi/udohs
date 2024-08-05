@@ -53,10 +53,13 @@ const SignUp = async (req: Request, res: Response) => {
         const now = new Date();
 
         // If a new user was inserted successfully, then 'result.acknowledged' will be true
+        // There is no point checking if a user with that email already exist, because if they do, an error will be thrown, since the 'email' field is an indexed field
         const result = await usersCollection.insertOne({
           dateJoined: now,
           password: hashPassword,
           profilePicture: null,
+          providerID: null,
+          provider: "appUser",
           email,
           fullName,
           phoneNumber,
@@ -65,15 +68,11 @@ const SignUp = async (req: Request, res: Response) => {
         if (result.acknowledged) {
           // Call the sign in function to sign in the user
           return await signInUserFunction(req, res, result.insertedId);
-        } else {
-          return res.status(404).json({ message: "An error occurred" });
         }
-      } else {
-        return res.status(404).json({ message: "An error occurred" });
       }
-    } else {
-      return res.status(404).json({ message: "An error occurred" });
     }
+
+    return res.status(404).json({ message: "An error occurred" });
   } catch {
     return res.status(404).json({ message: "An error occurred" });
   }

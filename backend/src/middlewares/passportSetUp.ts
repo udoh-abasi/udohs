@@ -1,17 +1,19 @@
-import passport, { DoneCallback } from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
+import passport from "passport";
 import { udohsDatabase } from "../utils/mongoDBClient";
 import { UserCollection } from "../utils/tsInterface";
 import bcrypt from "bcrypt";
+import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as JWTStrategy } from "passport-jwt";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Request } from "express";
 import { ObjectId } from "mongodb";
 import { decryptText } from "../utils/encryptAndDecryptText";
+import { frontendURL } from "../controllers/sendGoogleLinkController";
 
 // Augment the Express.User interface. If not, we will get errors below, that '_id' is not on type User
 declare global {
   namespace Express {
-    interface User extends UserCollection {} // Extend the default 'User' interface that passport user, to contain the properties in the 'UserCollection' interface
+    interface User extends UserCollection {} // Extend the default 'User' interface that passport uses, to contain the properties in the 'UserCollection' interface
   }
 }
 
@@ -65,6 +67,7 @@ const passportSetUp = () => {
     )
   );
 
+  // SET UP JWT
   passport.use(
     new JWTStrategy(
       {
@@ -84,6 +87,92 @@ const passportSetUp = () => {
           );
 
           return done(null, user);
+        } catch (err) {
+          return done(err);
+        }
+      }
+    )
+  );
+
+  // SET UP SIGN IN WITH GOOGLE
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID as string,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+        callbackURL: frontendURL, // NOTE: This is same as the 'Authorization callback URL' we provided on the GitHub site when setting up the app
+        passReqToCallback: true,
+      },
+      async (req, accessToken, refreshToken, profile, done) => {
+        // NOTE: The accessToken is used if we want to make subsequent API request to Google, on-behalf of the user
+        // NOTE: The refreshToken will be used to refresh the accessToken if it expires.
+        // The profile contains the user's identity
+
+        try {
+          // Hash the default password meant for all users that signed in with google
+          const hashPassword = await bcrypt.hash(
+            process.env.GOOGLE_USER_PASSWORD as string,
+            10 // 10 is the saltRounds
+          );
+
+          // Get the email
+          const email = profile._json.email as string;
+          const password = hashPassword;
+
+          // Get the database and get the 'users', collection.
+          // Specifying a TS Schema (TS Interface) is always optional, but it enables type hinting on
+          const usersCollection =
+            udohsDatabase.collection<UserCollection>("users");
+
+          // Check if a user with that email already exist, then update their password with the default password and sign them in
+          // So, we assumed a user with that email already exist, then we try to update their password at once. We do both in one request
+          const user = await usersCollection.findOneAndUpdate(
+            { email },
+            { $set: { password } }, // Update the password field with new password
+            { upsert: false, returnDocument: "after" } // NOTE: 'upsert' set to false will ensure no new document is created, if the document we searched for does not exist, while 'returnDocument' set to 'after' will ensure we get the updated document rather than the original
+          );
+
+          // If a user was updated (meaning the user already exist in our database), we return the user
+          if (user) {
+            return done(null, user);
+          }
+
+          // First Get the current date and time
+          const now = new Date();
+
+          const provider = profile.provider; // NOTE: This will always give us 'google'
+          const providerID = profile.id; // NOTE: This will give us the user's id, which is always same for a particular user
+
+          const fullName = profile.displayName;
+          const profilePicture = null;
+          const phoneNumber = "";
+          const dateJoined = now;
+
+          // If a user was NOT found, then we create a new user
+          if (provider && providerID && fullName) {
+            // Since insertOne does not return the inserted document, we use 'findOneAndUpdate', and we set 'upsert: true' so we can create and get back the document in one operation
+            const newUser = await usersCollection.findOneAndUpdate(
+              { email },
+              {
+                $set: {
+                  password,
+                  profilePicture,
+                  providerID,
+                  provider,
+                  fullName,
+                  phoneNumber,
+                  dateJoined,
+                },
+              },
+              { upsert: true, returnDocument: "after" }
+            );
+
+            if (newUser) {
+              return done(null, newUser);
+            }
+          }
+
+          return done(null, false);
         } catch (err) {
           return done(err);
         }

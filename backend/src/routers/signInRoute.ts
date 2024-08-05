@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { validateEmail } from "../middlewares/validation";
 import SignIn from "../controllers/signInController";
 import passport from "passport";
 

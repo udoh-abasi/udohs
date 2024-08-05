@@ -1,14 +1,16 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FaUserPlus } from "react-icons/fa";
 import { hideForm, showForm } from "./showOrHideSignUpAndRegisterForms";
 import Forgot_Password from "./forgotPassword";
 import Sign_Up from "./sign_up";
 import Sign_In from "./sign_in";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import axiosClient from "./axiosSetup";
 import { useDispatch, useSelector } from "react-redux";
 import { userSelector } from "../reduxFiles/selectors";
 import { userAction } from "../reduxFiles/actions";
+import { AiOutlineClose } from "react-icons/ai";
+import Loader from "./loader";
 
 const Header = () => {
   const user = useSelector(userSelector);
@@ -35,6 +37,89 @@ const Header = () => {
 
     getUser();
   }, [dispatch, navigate]);
+
+  const [googleSignUpMessage, setGoogleSignUpMessage] = useState("failed");
+
+  // Get the google's code from the user (URL) and send it to the backend
+  const [searchParams] = useSearchParams();
+
+  const [googleCode, setGoogleCode] = useState("");
+
+  const firstRender = useRef<boolean>(); // NOTE: This is used in development to prevent the useEffect from running twice
+
+  // This function pops up the message box, when sign-up-with-google is successful or failed
+  const showGoogleMessagePopUp = () => {
+    const thePopUp = document.querySelector("#googleMessagePopUp");
+    thePopUp?.classList.remove("hidden");
+
+    setTimeout(() => {
+      thePopUp?.classList.remove("-bottom-36");
+      thePopUp?.classList.add("bottom-16");
+    }, 0.05);
+  };
+
+  const hideGoogleMessagePopUp = () => {
+    const thePopUp = document.querySelector("#googleMessagePopUp");
+    thePopUp?.classList.remove("bottom-16");
+    thePopUp?.classList.add("-bottom-36");
+
+    setTimeout(() => {
+      thePopUp?.classList.add("hidden");
+    }, 500);
+  };
+
+  useEffect(() => {
+    const getGoogleUser = async () => {
+      // Get the code from the URL
+      const code = searchParams.get("code");
+
+      if (code) {
+        setGoogleCode(code);
+        dispatch(userAction({ userLoading: true }));
+        try {
+          // Send code to the backend
+          const response = await axiosClient.post(`/api/signinwithgoogle`, {
+            code,
+          });
+
+          if (response.status === 200) {
+            dispatch(
+              userAction({ userLoading: true, userData: response.data })
+            );
+            navigate("/");
+
+            setGoogleSignUpMessage("success");
+            showGoogleMessagePopUp();
+            setTimeout(hideGoogleMessagePopUp, 10000);
+            dispatch(userAction({ userLoading: false }));
+          }
+        } catch (e) {
+          setGoogleSignUpMessage("failed");
+          dispatch(userAction({ userLoading: false, userData: null }));
+          navigate("/");
+          showGoogleMessagePopUp();
+
+          // Hide the popup after 10 seconds
+          setTimeout(hideGoogleMessagePopUp, 10000);
+        }
+      }
+    };
+
+    // So, if we are in development mode, we don't want this to execute twice.
+    // NOTE: 'process.env.NODE_ENV' works without we installing anything, except TS checks with node, using 'npm i @types/node'
+    if ((process.env.NODE_ENV as string) === "development") {
+      if (!firstRender.current) {
+        firstRender.current = true;
+
+        // Get the google user
+        getGoogleUser();
+      } else {
+        //
+      }
+    } else {
+      getGoogleUser();
+    }
+  }, [searchParams]);
 
   return (
     <header className="p-4">
@@ -199,6 +284,43 @@ const Header = () => {
           }}
         />
       </section>
+
+      {googleSignUpMessage && (
+        <div
+          id="googleMessagePopUp"
+          className="-bottom-36 hidden rounded-2xl fixed font-bold z-50 max-w-[400px] right-0 w-full p-4 bg-gray-200 -translate-y-1/2 shadow-[0px_5px_15px_rgba(0,0,0,0.35)] transition-all duration-500 ease-linear"
+        >
+          {googleSignUpMessage === "success" && (
+            <p className="text-center text-green-500">Sign in Successful</p>
+          )}
+
+          {googleSignUpMessage === "failed" && (
+            <p className="text-center text-red-500">
+              Google verification failed. Please sign up with an email and
+              password
+            </p>
+          )}
+
+          <button
+            aria-label="close"
+            type="button"
+            className="text-2xl absolute top-1 right-1 text-black cursor-pointer"
+            onClick={() => {
+              hideGoogleMessagePopUp();
+            }}
+          >
+            <AiOutlineClose />
+          </button>
+        </div>
+      )}
+
+      {user.userLoading && googleCode && (
+        <div className="fixed z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[rgba(255,255,255,0.5)] dark:bg-[rgba(0,0,0,0.5)] w-full h-full">
+          <div className="fixed top-1/2 left-1/2 z-10">
+            <Loader />
+          </div>
+        </div>
+      )}
     </header>
   );
 };

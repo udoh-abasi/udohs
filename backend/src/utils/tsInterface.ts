@@ -2,6 +2,8 @@ import { ObjectId } from "mongodb";
 
 export interface UserCollection {
   _id?: string | ObjectId;
+  providerID: string | null;
+  provider: "appUser" | "google";
   email: string;
   password: string;
   phoneNumber: string;

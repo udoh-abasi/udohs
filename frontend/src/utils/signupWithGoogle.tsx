@@ -4,19 +4,19 @@ import React, { useEffect, useState } from "react";
 import axiosClient from "../utils/axiosSetup";
 import { SignUpWithGoogleProps } from "./tsInterface";
 
-const SignUpWithGoogle: React.FC<SignUpWithGoogleProps> = ({ text }) => {
+const SignUpWithGoogle: React.FC<SignUpWithGoogleProps> = () => {
   const [googleLink, setGoogleLink] = useState("");
 
   // This gets the Link that the user will be redirected to, when they click 'Sign in with Google'
   useEffect(() => {
     const getGoogleLink = async () => {
       try {
-        const response = await axiosClient.get("/api/getLink");
+        const response = await axiosClient.get("/api/getgooglelink");
         if (response.status === 200) {
-          setGoogleLink(response.data.theURL.auth_url);
+          setGoogleLink(response.data.auth_url);
         }
       } catch {
-        //
+        setGoogleLink("");
       }
     };
 
@@ -36,7 +36,7 @@ const SignUpWithGoogle: React.FC<SignUpWithGoogleProps> = ({ text }) => {
           window.location.href = googleLink;
           // resetPasswordFields();
         }}
-        className="flex justify-center items-center w-[90%] max-w-[280px] h-[52px] border-white border-2 hover:bg-gray-200 hover:text-black font-medium  rounded-3xl disabled:text-red-500 disabled:cursor-not-allowed"
+        className="flex justify-center items-center w-[90%] max-w-[280px] h-[52px] border-white border-[3px] hover:bg-gray-200 hover:text-black font-medium  rounded-3xl disabled:text-red-500 disabled:cursor-not-allowed"
       >
         <svg
           version="1.1"
@@ -64,7 +64,7 @@ const SignUpWithGoogle: React.FC<SignUpWithGoogleProps> = ({ text }) => {
             <path fill="none" d="M0 0h48v48H0z"></path>
           </g>
         </svg>
-        <span>{text}</span>
+        <span className="font-bold">Continue with google</span>
       </button>
     </div>
   );

@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import { encryptText } from "../utils/encryptAndDecryptText";
 import { ObjectId } from "mongodb";
 
-// This is a helper function that just generates the token, encrypt it and set as a cookie in the frontend.
-// It was defined separately because we used it in the signUp controller as well
+// This is a helper function that just generates the JWT token, encrypt it and set as a cookie in the frontend.
+// It was defined separately because we used it in the 'signUp' controller and 'signInWithGoogle' controller as well
 export const signInUserFunction = async (
   req: Request,
   res: Response,
@@ -31,7 +31,7 @@ export const signInUserFunction = async (
     return res.status(200).json({ email: req.user?.email, id: req.user?._id });
   } else {
     console.log("Error no ID", theID);
-    res.sendStatus(400);
+    return res.sendStatus(400);
   }
 };
 

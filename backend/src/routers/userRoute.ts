@@ -3,6 +3,7 @@ import passport from "passport";
 
 const router = Router();
 
+// Return the currently logged in user
 router.get(
   "/getuser",
   passport.authenticate("jwt", { session: false }),

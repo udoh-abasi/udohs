@@ -51,8 +51,6 @@ const ForgotPassword = async (req: Request, res: Response) => {
           { upsert: false } // NOTE: This will ensure no new document is created, if the document we searched for does not exist
         );
 
-        console.log(result);
-
         // NOTE: 'matchedCount' will be equal to one (1) if a document was found, and 'modifiedCount' will be one (1) if the document was document
         if (result.matchedCount === 1 && result.modifiedCount === 1) {
           return res.sendStatus(200);
