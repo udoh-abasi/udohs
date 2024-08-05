@@ -12,7 +12,8 @@ export const userReducer = createReducer(initialValue, (builder) => {
 });
 
 export const isLoadingReducer = createReducer(false, (builder) => {
-  builder.addCase(isLoadingAction, (state, action) => {
+  // Prefix the 'state' with an underscore, to tell es-lint that I do not want to use it
+  builder.addCase(isLoadingAction, (_state, action) => {
     const { payload } = action;
     return payload;
   });
