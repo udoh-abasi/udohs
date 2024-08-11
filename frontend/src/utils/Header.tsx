@@ -25,6 +25,8 @@ const Header = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
+        dispatch(userAction({ userLoading: true }));
+
         const response = await axiosClient.get("/api/getuser");
         if (response.status === 200) {
           dispatch(userAction({ userLoading: false, userData: response.data }));
@@ -315,7 +317,7 @@ const Header = () => {
       )}
 
       {user.userLoading && googleCode && (
-        <div className="fixed z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[rgba(255,255,255,0.5)] dark:bg-[rgba(0,0,0,0.5)] w-full h-full">
+        <div className="fixed z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[rgba(255,255,255,0.5)] w-full h-full">
           <div className="fixed top-1/2 left-1/2 z-10">
             <Loader />
           </div>

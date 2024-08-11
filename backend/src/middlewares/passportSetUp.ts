@@ -46,8 +46,8 @@ const passportSetUp = () => {
 
           // Find the user
           const user = await userCollection.findOne(
-            { email },
-            { projection: { _id: 1, email: 1, password: 1 } } // Get only the '_id', 'email' and 'password' fields. Ignore every other field
+            { email }
+            // { projection: { _id: 1, email: 1, password: 1 } } // Get only the '_id', 'email' and 'password' fields. Ignore every other field
           );
 
           if (user) {
@@ -83,7 +83,7 @@ const passportSetUp = () => {
 
           const user = await userCollection.findOne(
             { _id: ObjectId.createFromHexString(JWTPayload.userID) }, // We search for the user using the userID we stored in the jwt payload (during signIn or signUp). Use 'ObjectId.createFromHexString' to avoid errors,
-            { projection: { _id: 1, email: 1 } } // We just want 'req.user' to hold the 'id' and the 'email' fields, and ignore other fields
+            { projection: { password: 0, providerID: 0, provider: 0 } } // We just want 'req.user' to hold everything except password, provider and providerID fields
           );
 
           return done(null, user);

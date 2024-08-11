@@ -5,8 +5,15 @@ import { BiSave } from "react-icons/bi";
 import Loader from "./loader";
 import { hideForm } from "./showOrHideSignUpAndRegisterForms";
 import { FaRegWindowClose } from "react-icons/fa";
+import { userAction } from "../reduxFiles/actions";
+import axiosClient, { profilePictureURL } from "./axiosSetup";
+import { useDispatch, useSelector } from "react-redux";
+import { userSelector } from "../reduxFiles/selectors";
 
 const EditProfile = () => {
+  const theUserSelector = useSelector(userSelector);
+  const user = theUserSelector.userData;
+
   // NOTE: This is a hack to ensure that the <input type=file/> responsible for collecting image is always empty. This will make the react-cropper interface show up anytime the user selects a picture.
   // If this is not set to an empty string (after the image has been edited), then if the user selects the same picture twice (back-to-back), the interface will not show up the second time
   const [imageOnInput, setImageOnInput] = useState("");
@@ -27,23 +34,99 @@ const EditProfile = () => {
   const [showImageCropperInterface, setShowImageCropperInterface] =
     useState(false);
 
+  // This function runs to display the right image on the edit image field
   const showImage = () => {
     if (croppedImageAndCanvas?.croppedImage) {
       return croppedImageAndCanvas.croppedImage;
-    }
-    // else if (user.profile_pic) {
-    //   return profilePicURL + `${user.profile_pic}`;
-    // }
-    else {
+    } else if (user?.profilePicture) {
+      return `${profilePictureURL}/${user.profilePicture}`;
+    } else {
       return "/Profile_Image_Placeholder-small.jpg";
     }
   };
 
-  const [fullName, setFullName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [fullName, setFullName] = useState(user?.fullName ? user.fullName : "");
+  const [phoneNumber, setPhoneNumber] = useState(
+    user?.phoneNumber ? user.phoneNumber : ""
+  );
 
   const [editProfileLoading, setEditProfileLoading] = useState(false);
   const [editProfileError, setEditProfileError] = useState(false);
+
+  const dispatch = useDispatch();
+
+  // This function runs to edit the user's profile
+  const editProfile = async () => {
+    setEditProfileLoading(true);
+    setEditProfileError(false);
+
+    // If the user want to edit their profile image
+    if (croppedImageAndCanvas?.canvas) {
+      croppedImageAndCanvas.canvas.toBlob(async (blob) => {
+        const formData = new FormData();
+
+        const currentDateTime = new Date().toISOString().replace(/:/g, "-"); // Get current date and time and append to the name of the image. This is a fix for a bug, bcoz the backend deletes the old image and saves the new one. Which will give the old and new image the same name, therefore the frontend will not re-render that new image until you refresh bcoz its the same name
+
+        const slashIndex = imageFormat.indexOf("/"); // Since the extension will be in the format 'image/wep' or 'image/jpg', we get the index of the slash, and then slice from there
+        const imageExtension = imageFormat.slice(slashIndex + 1); // So, this will return something like 'web', 'jpg' (taking out everything before slash (/))
+
+        // So, the name of the image will be in the form 'udoh_2023-09-14T03:14:05.752Z.webp'
+        if (blob) {
+          formData.append(
+            "profilePic", // The first argument is the name of the field (which the backend will use to get the image)
+
+            blob, // The second argument is the image
+
+            // NOTE: This third argument is the filename
+            `${fullName.replace(
+              /:/g,
+              "-"
+            )}_${currentDateTime}.${imageExtension}`
+          );
+        }
+
+        formData.append("fullName", fullName);
+        formData.append("phoneNumber", phoneNumber);
+
+        try {
+          const response = await axiosClient.post("/api/edituser", formData, {
+            headers: {
+              "content-type": "multipart/form-data",
+            },
+          });
+          if (response.status === 200) {
+            const data = response.data;
+            dispatch(userAction({ userData: data }));
+            hideForm("#editProfile");
+          }
+          setEditProfileLoading(false);
+        } catch (error) {
+          console.error("Error uploading cropped image:", error);
+          setEditProfileError(true);
+          setEditProfileLoading(false);
+        }
+      }, imageFormat); // Set format here to the original image's format otherwise, the cropped image will be larger in size (in mb or kb) than the original image
+    } else {
+      // So, if the user does not want to change their profile pic, this will run this instead
+      try {
+        const formData = new FormData();
+        formData.append("fullName", fullName);
+        formData.append("phoneNumber", phoneNumber);
+
+        const response = await axiosClient.post("/api/edituser", formData);
+        if (response.status === 200) {
+          const data = response.data;
+          dispatch(userAction({ userData: data }));
+          hideForm("#editProfile");
+        }
+        setEditProfileLoading(false);
+      } catch (error) {
+        console.error("Error sending without image:", error);
+        setEditProfileError(true);
+        setEditProfileLoading(false);
+      }
+    }
+  };
 
   return (
     <div className="grid place-items-center h-screen overflow-auto">
@@ -58,7 +141,7 @@ const EditProfile = () => {
             setEditProfileError(false);
             setEditProfileLoading(false);
 
-            // editProfile();
+            editProfile();
           }}
         >
           <div className="flex justify-center">

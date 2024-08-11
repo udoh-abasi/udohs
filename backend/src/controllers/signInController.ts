@@ -15,7 +15,7 @@ export const signInUserFunction = async (
     const token = jwt.sign(
       { userID: theID }, // This is the payload
       process.env.SESSION_SECRET as string, // Pass in the secret
-      { expiresIn: "72h" } // Token to expire in 3 days
+      { expiresIn: "3 days" } // Token to expire in 3 days
     );
 
     // Encrypt the token before sending to the frontend
@@ -28,7 +28,14 @@ export const signInUserFunction = async (
       sameSite: "strict",
     });
 
-    return res.status(200).json({ email: req.user?.email, id: req.user?._id });
+    return res.status(200).json({
+      id: req.user?._id,
+      email: req.user?.email,
+      phoneNumber: req.user?.phoneNumber,
+      fullName: req.user?.fullName,
+      dateJoined: req.user?.dateJoined,
+      profilePicture: req.user?.profilePicture,
+    });
   } else {
     console.log("Error no ID", theID);
     return res.sendStatus(400);

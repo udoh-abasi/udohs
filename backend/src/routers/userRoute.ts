@@ -10,9 +10,14 @@ router.get(
   async (req, res) => {
     try {
       if (req.user) {
-        return res
-          .status(200)
-          .json({ email: req.user?.email, id: req.user?._id });
+        return res.status(200).json({
+          id: req.user?._id,
+          email: req.user?.email,
+          phoneNumber: req.user?.phoneNumber,
+          fullName: req.user?.fullName,
+          dateJoined: req.user?.dateJoined,
+          profilePicture: req.user?.profilePicture,
+        });
       } else {
         throw new Error("Something went wrong");
       }
