@@ -17,3 +17,23 @@ export interface EmailAndVerificationCodeCollection {
   code: string;
   isVerified: boolean;
 }
+
+export interface ProductCollection {
+  _id?: string | ObjectId;
+  productOwnerID: string | ObjectId;
+  country: string;
+  state: string;
+  currency: string;
+  amount: string;
+  title: string;
+  description: string;
+  photos: string[];
+  category:
+    | "vehicle"
+    | "phone"
+    | "computer"
+    | "homeAppliances"
+    | "fashion"
+    | "properties"
+    | "others";
+}

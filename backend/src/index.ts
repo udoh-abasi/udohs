@@ -13,6 +13,7 @@ import forgotPasswordRouter from "./routers/forgotPasswordRoute";
 import getGoogleLinkRouter from "./routers/sendGoogleLinkRoute";
 import signInWithGoogleRouter from "./routers/signInWithGoogleRoute";
 import editUserRouter from "./routers/editUserRoute";
+import sellRouter from "./routers/sellRoute";
 import { connectToMongo } from "./utils/mongoDBClient";
 import createCollections from "./utils/createCollections";
 import cookieParser from "cookie-parser";
@@ -76,6 +77,7 @@ app.use("/api", [
   getGoogleLinkRouter,
   signInWithGoogleRouter,
   editUserRouter,
+  sellRouter,
 ]);
 
 // Connect to mongodb, and if successful, create collections and start the app

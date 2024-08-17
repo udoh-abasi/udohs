@@ -178,6 +178,12 @@ const EditProfile = () => {
             >
               Change picture
             </label>
+            <p className="italic font-bold text-xs text-center text-black">
+              <span className="block">
+                (Preferred image dimension is 300 X 300.
+              </span>
+              <span className="block">Maximum of 10MB)</span>
+            </p>
           </div>
 
           {showImageCropperInterface && (

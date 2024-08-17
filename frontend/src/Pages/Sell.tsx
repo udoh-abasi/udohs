@@ -10,8 +10,17 @@ import ImageCropper from "../utils/imageCropper";
 import { ReactSortable } from "react-sortablejs";
 import uuid4 from "uuid4";
 import { AiFillWarning } from "react-icons/ai";
+import Loader from "../utils/loader";
+import axiosClient from "../utils/axiosSetup";
+import { userSelector } from "../reduxFiles/selectors";
+import { useSelector } from "react-redux";
+import EditProfile from "../utils/editProfile";
+import { hideForm, showForm } from "../utils/showOrHideSignUpAndRegisterForms";
 
 const Sell = () => {
+  const theUserSelector = useSelector(userSelector);
+  const user = theUserSelector.userData;
+
   // This holds the available category options the user can select from. Default is null
   const [category, setCategory] = useState<categoryOptionsInterface | null>(
     null
@@ -47,22 +56,22 @@ const Sell = () => {
   // NOTE: This holds the image to be sent to 'react-cropper', to crop
   const [imageToCrop, setImageToCrop] = useState<string>("");
 
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+
   // The 'canvas' and the 'croppedImage' will be stored here. We will display the 'croppedImage' on the website and use the 'canvas' to send the image to the backend.
   // NOTE: We also have the 'id', which is required since we will be using 'ReactSortable' to easily click and drag-and-drop images to change the arrangement
   const [croppedImageAndCanvas, setCroppedImageAndCanvas] = useState<
-    { croppedImage: string; canvas: HTMLCanvasElement; id: string }[]
+    {
+      croppedImage: string;
+      canvas: HTMLCanvasElement;
+      id: string;
+      imageFormat: string;
+    }[]
   >([]);
 
   const [showImageCropperInterface, setShowImageCropperInterface] =
     useState(false);
-
-  useEffect(() => {
-    console.log(country);
-    console.log(state);
-    console.log(categoryValue);
-    console.log(currencyValue);
-    console.log(amount);
-  }, [state, country, categoryValue, currencyValue, amount]);
 
   // These are the options that will be used to populate the category's <Select>
   const categoryOptions: categoryOptionsInterface[] = [
@@ -125,7 +134,8 @@ const Sell = () => {
   // NOTE: We also added 'id' field, which we used uuid4. It is mandatory to add an id field, for 'ReactSortable' to work perfectly
   const runSetCroppedImageAndCanvas = (
     canvas: HTMLCanvasElement,
-    croppedImage: string
+    croppedImage: string,
+    imageFormat: string
   ) => {
     const imageAlreadyExist = croppedImageAndCanvas.some(
       (eachValue) => eachValue.croppedImage === croppedImage
@@ -136,16 +146,157 @@ const Sell = () => {
     } else {
       setCroppedImageAndCanvas([
         ...croppedImageAndCanvas,
-        { id: uuid4(), croppedImage, canvas },
+        { id: uuid4(), croppedImage, canvas, imageFormat },
       ]);
     }
   };
+
+  const [errorPostingSell, setErrorPostingSell] = useState<
+    string | React.JSX.Element
+  >("");
+
+  const [requestLoading, setRequestLoading] = useState(false);
+
+  // This function takes the canvas and sets it in the form-data, on the field called 'photos'
+  // NOTE: All images will be appended to this field, which will make the field to be an array of images (e.g [File, File, File])
+  // NOTE: Because of the asynchronous nature of 'toBlob', if we do not put our function in a promise, we will NOT get the image files in the form-data
+  const appendBlob = async (
+    theCanvas: HTMLCanvasElement,
+    theImageFormat: string,
+    theFormData: FormData
+  ): Promise<void> => {
+    // Return a promise, then wrap the 'canvas.toBlob' in the function.
+    return new Promise((resolve) => {
+      theCanvas.toBlob((blob) => {
+        // Create the image's name
+        // First, get the current date and time to make the image name unique, however, replace colons (:) with a dash (-), to avoid errors in the backend, as Windows does not allow saving images files with a colon (:) in it name
+        const currentDateTime = new Date().toISOString().replace(/:/g, "-");
+
+        const slashIndex = theImageFormat.indexOf("/"); // Since the extension will be in the format 'image/wep' or 'image/jpg', we get the index of the slash, and then slice from there
+        const imageExtension = theImageFormat.slice(slashIndex + 1); // So, this will return something like 'web', 'jpg' (taking out everything before slash (/))
+
+        let imageName;
+        if (user?.fullName) {
+          imageName = `${user?.fullName.replace(
+            /:/g,
+            "-"
+          )}_${currentDateTime}.${imageExtension}`;
+        } else {
+          throw new Error("User not signed in. fullName not found");
+        }
+
+        console.log(imageName);
+
+        if (blob) {
+          // Append in 'photos' field. This will make the field an array
+          theFormData.append("photos", blob, imageName);
+        }
+
+        // Make sure you resolve, if not the function will hang
+        resolve();
+      }, theImageFormat);
+    });
+  };
+
+  const postSell = async () => {
+    try {
+      setRequestLoading(true);
+      setErrorPostingSell("");
+
+      const myFormData = new FormData();
+
+      // First, we map through the canvas, and append all the image's blob in the 'formData'
+      // 'Promise.all' takes an array of promises, that is why we used '.map'
+
+      await Promise.all(
+        croppedImageAndCanvas.map(async (value) => {
+          // We have to await the 'appendBlob', if not, there will be an error
+          await appendBlob(value.canvas, value.imageFormat, myFormData);
+        })
+      );
+
+      console.log("photos", myFormData.getAll("photos"));
+
+      // Then we append other text fields
+      myFormData.append("category", categoryValue);
+      myFormData.append("country", country);
+      myFormData.append("state", state);
+      myFormData.append("currency", currencyValue);
+      myFormData.append("amount", amount);
+      myFormData.append("title", title);
+      myFormData.append("description", description);
+
+      const response = await axiosClient.post("/api/sell", myFormData, {
+        headers: {
+          "content-type": "multipart/form-data",
+        },
+      });
+
+      if (response.status === 200) {
+        // Reset everything
+        // setCategoryValue("");
+        // setCategory(null);
+        // setCountry("");
+        // setState("");
+
+        // setCurrencyValue("");
+        // setCurrency(null);
+        // setAmount("");
+        // setTitle("");
+        // setDescription("");
+
+        setRequestLoading(false);
+        // setErrorPostingSell("");
+
+        console.log(response.data);
+      }
+    } catch {
+      setRequestLoading(false);
+      setErrorPostingSell("Something went wrong");
+    }
+  };
+
+  // This useEffect checks if the user has provided a phone number. Then it hides the error message
+  useEffect(() => {
+    if (user?.phoneNumber) {
+      setErrorPostingSell("");
+    }
+  }, [user?.phoneNumber]);
 
   return (
     <main className="min-h-screen">
       <form
         onSubmit={(e) => {
           e.preventDefault();
+
+          // Check if there is a user, and if the user has selected images
+          if (
+            user &&
+            user.phoneNumber &&
+            croppedImageAndCanvas.length &&
+            !requestLoading
+          ) {
+            // Send request to backend
+            postSell();
+          } else if (!user) {
+            setErrorPostingSell("You must be signed in to continue");
+          } else if (!user.phoneNumber) {
+            // user.phoneNumber will be empty if the user signed in with google
+            setErrorPostingSell(
+              <span>
+                Kindly{" "}
+                <button
+                  className="underline"
+                  onClick={() => showForm("#editProfile")}
+                >
+                  click here
+                </button>{" "}
+                to provide a phone number to reach you with
+              </span>
+            );
+          } else if (!croppedImageAndCanvas.length) {
+            setErrorPostingSell("You must be add at least one image");
+          }
         }}
         className="p-4 min-[550px]:p-8 my-8 max-w-[550px] mx-auto rounded-2xl bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
       >
@@ -165,7 +316,7 @@ const Sell = () => {
               // NOTE: I used this if-else block to avoid TS errors, which does not allow accessing 'option.label', as 'option' may be null
               if (option) {
                 setCategory(option);
-                setCategoryValue(option.label);
+                setCategoryValue(option.value);
               } else {
                 setCategoryValue("");
                 setCategory(null);
@@ -240,6 +391,10 @@ const Sell = () => {
             id="title"
             required
             className="block h-[37px] w-full p-1 rounded-lg"
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
+            }}
           />
         </div>
 
@@ -255,6 +410,10 @@ const Sell = () => {
             id="description"
             required
             className="w-full h-40 p-1 rounded-lg resize-none"
+            value={description}
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
           ></textarea>
         </div>
 
@@ -263,8 +422,9 @@ const Sell = () => {
 
           <p className="mt-3 font-bold text-black">
             Add at least 1 photo{" "}
-            <span className="italic text-sm block -mt-2">
-              (preferred image dimension is 1080 X 780)
+            <span className="italic text-sm block -mt-1 text-red-500 font-normal">
+              (preferred image dimension is 1080 X 780 with maximum size of
+              10MB)
             </span>
           </p>
 
@@ -332,8 +492,12 @@ const Sell = () => {
             //
 
             // NOTE: This sets the croppedImage and the canvas from react-cropper
-            setCroppedImageAndCanvasOnParent={(canvas, croppedImage) => {
-              runSetCroppedImageAndCanvas(canvas, croppedImage);
+            setCroppedImageAndCanvasOnParent={(
+              canvas,
+              croppedImage,
+              theImageFormat
+            ) => {
+              runSetCroppedImageAndCanvas(canvas, croppedImage, theImageFormat);
             }}
           />
         )}
@@ -405,12 +569,29 @@ const Sell = () => {
               // Just reset this if it is true
               setDuplicateImage(false);
             }}
-            className="block text-2xl rounded-lg w-full hover:ring-2 ring-white text-white px-4 py-2 uppercase font-bold shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+            disabled={requestLoading}
+            className="block text-2xl rounded-lg w-full hover:ring-2 ring-white text-white px-4 py-2 uppercase font-bold shadow-[0px_5px_15px_rgba(0,0,0,0.35)] disabled:cursor-not-allowed"
           >
-            Post
+            <>{requestLoading ? <Loader /> : <>Post</>}</>
           </button>
         </div>
+
+        {errorPostingSell ? (
+          <p className="text-red-500 font-bold italic text-sm flex items-center justify-center -mt-6">
+            <AiFillWarning className="text-2xl" /> {errorPostingSell}
+          </p>
+        ) : (
+          <></>
+        )}
       </form>
+
+      <section
+        id="editProfile"
+        className="bg-[rgba(0,0,0,.7)] fixed z-50 top-[1200px] left-0 w-full h-full hidden transition-all duration-500 ease-in-out"
+        onClick={() => hideForm("#editProfile")}
+      >
+        <EditProfile />
+      </section>
     </main>
   );
 };

@@ -8,8 +8,11 @@ const createCollections = async () => {
         validator: {
           $jsonSchema: {
             bsonType: "object", // NOTE: This means the collection will be an object
+
             title: "Email and Verification Code object validation",
+
             required: ["email", "code"], // State the required fields in the collection
+
             properties: {
               email: {
                 bsonType: "string", // Email field should be a string
@@ -42,7 +45,7 @@ const createCollections = async () => {
         $jsonSchema: {
           bsonType: "object", // NOTE: This means the collection will be an object
 
-          title: "Email and Verification Code object validation",
+          title: "Users object validation",
 
           // State the required fields in the collection
           required: [
@@ -109,6 +112,93 @@ const createCollections = async () => {
   } catch (e) {
     console.log("Error creating collections", e);
   }
+
+  // Create the collection to store a products
+  await udohsDatabase.createCollection("products", {
+    validator: {
+      $jsonSchema: {
+        bsonType: "object", // NOTE: This means the collection will be an object
+
+        title: "Products object validation",
+
+        // State the required fields in the collection
+        required: [
+          "productOwnerID",
+          "category",
+          "country",
+          "state",
+          "currency",
+          "amount",
+          "title",
+          "description",
+          "photos",
+        ],
+
+        // Define what each fields should contain
+        properties: {
+          productOwnerID: {
+            bsonType: ["string", "objectId"], // This field should be a string or an objectid
+            description:
+              "'productOwnerID' must be a string or objectid and is required",
+          },
+
+          category: {
+            bsonType: "string", // This field should be a string also
+            enum: [
+              "vehicle",
+              "phone",
+              "computer",
+              "homeAppliances",
+              "fashion",
+              "properties",
+              "others",
+            ],
+            description:
+              "'category' must only be one of the enum values and is required",
+          },
+
+          country: {
+            bsonType: "string",
+            description: "'country' must be a string and is required",
+          },
+
+          state: {
+            bsonType: "string",
+            description: "'state' must be a string and is required",
+          },
+
+          currency: {
+            bsonType: "string",
+            enum: ["&#8358;", "&#36;", "&#8364;"],
+            description:
+              "'currency' must be a string, must be a value from the enum and is required",
+          },
+
+          amount: {
+            bsonType: "string",
+            description: "'amount' must be a string and is required",
+          },
+
+          title: {
+            bsonType: "string",
+            description: "'title' must be a string and is required",
+          },
+
+          description: {
+            bsonType: "string",
+            description: "'description' must be a string and is required",
+          },
+
+          photos: {
+            bsonType: "array",
+            items: { bsonType: "string" },
+            description:
+              "'photos' must be either an array of strings of strings and is required",
+          },
+        },
+      },
+    },
+  });
 };
 
 export default createCollections;

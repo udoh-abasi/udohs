@@ -63,10 +63,13 @@ export interface ForgotPasswordProps {
 // This is used on the 'imageCropper.tsx' to define the props
 export interface ImageCropperProps {
   setShowImageCropperInterface: () => void;
+
   setImageOnInput: () => void;
+
   setCroppedImageAndCanvasOnParent: (
     canvas: HTMLCanvasElement,
-    croppedImage: string
+    croppedImage: string,
+    imageFormat: string
   ) => void;
 
   // NOTE: Any image that we get using <input type="file" /> will be one of this types

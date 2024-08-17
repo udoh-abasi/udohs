@@ -52,7 +52,8 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
       height: desiredHeight,
     });
 
-    if (canvas) setCroppedImageAndCanvasOnParent(canvas, croppedImage);
+    if (canvas)
+      setCroppedImageAndCanvasOnParent(canvas, croppedImage, imageFormat);
   };
 
   return (
@@ -70,7 +71,6 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
                 maxHeight: "300px",
                 overflow: "hidden",
               }}
-              //aspectRatio={16 / 9} // Set the aspect ratio (optional)
               guides={false} // Show cropping guides inside the cropBox (optional)
               crop={handleCrop} // Callback function when cropping is done (optional)
               zoomOnTouch={false} // Prevent zooming in or out by pinching the image, on touch devices
