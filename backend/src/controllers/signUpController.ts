@@ -67,7 +67,16 @@ const SignUp = async (req: Request, res: Response) => {
 
         if (result.acknowledged) {
           // Call the sign in function to sign in the user
-          return await signInUserFunction(req, res, result.insertedId);
+          // Since we have not used passport, 'req.user' will be 'undefined', so we have to send the id, email, fullName etc to the user
+          return await signInUserFunction(
+            req,
+            res,
+            result.insertedId,
+            email,
+            fullName,
+            phoneNumber,
+            now
+          );
         }
       }
     }

@@ -28,6 +28,7 @@ export interface ProductCollection {
   title: string;
   description: string;
   photos: string[];
+  dateAdded: Date;
   category:
     | "vehicle"
     | "phone"

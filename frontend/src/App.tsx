@@ -41,7 +41,7 @@ function App() {
 
           <Route path="/items" element={<AllItems />} />
 
-          <Route path="/item" element={<ItemDisplay />} />
+          <Route path="/item/:productID" element={<ItemDisplay />} />
 
           <Route path="/chat" element={<Chat />} />
 

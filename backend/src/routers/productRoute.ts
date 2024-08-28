@@ -1,7 +1,9 @@
 import { Router } from "express";
 import passport from "passport";
-import Sell from "../controllers/sellController";
 import multer from "multer";
+import AddProduct from "../controllers/AddNewProductController";
+import GetOneProduct from "../controllers/GetOneProductController";
+import GetAllProduct from "../controllers/GetAllProductController";
 
 const router = Router();
 
@@ -26,11 +28,18 @@ const photosUpload = multer({
   },
 });
 
+// This is the post route that adds a new product
 router.post(
-  "/sell",
+  "/product",
   passport.authenticate("jwt", { session: false }),
   photosUpload.array("photos"),
-  Sell
+  AddProduct
 );
+
+// This route returns the individual product requested by the user
+router.get("/product/:productID", GetOneProduct);
+
+// This route returns ALL product requested by the user
+router.get("/product", GetAllProduct);
 
 export default router;

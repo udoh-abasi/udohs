@@ -89,3 +89,24 @@ export interface User {
   dateJoined: Date;
   profilePicture?: string | null;
 }
+
+// This is the product interface
+export interface Product {
+  _id: string;
+  productOwnerID: string;
+  country: string;
+  state: string;
+  currency: string;
+  amount: string;
+  title: string;
+  description: string;
+  photos: string[];
+  category:
+    | "vehicle"
+    | "phone"
+    | "computer"
+    | "homeAppliances"
+    | "fashion"
+    | "properties"
+    | "others";
+}

@@ -6,6 +6,9 @@ export const backendURL = "http://localhost:8000";
 // The URL where the profile images can be gotten from
 export const profilePictureURL = `${backendURL}/image/profileImages`;
 
+// The URL where the product images can be gotten from
+export const productImagesURL = `${backendURL}/image/productPhotos`;
+
 // NOTE: Here, we create an axios instance with the django's base URL, so we only have to type in the django's base URL just once
 const axiosClient = axios.create({
   baseURL: backendURL,

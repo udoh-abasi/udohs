@@ -16,10 +16,13 @@ import { userSelector } from "../reduxFiles/selectors";
 import { useSelector } from "react-redux";
 import EditProfile from "../utils/editProfile";
 import { hideForm, showForm } from "../utils/showOrHideSignUpAndRegisterForms";
+import { useNavigate } from "react-router-dom";
 
 const Sell = () => {
   const theUserSelector = useSelector(userSelector);
   const user = theUserSelector.userData;
+
+  const navigate = useNavigate();
 
   // This holds the available category options the user can select from. Default is null
   const [category, setCategory] = useState<categoryOptionsInterface | null>(
@@ -86,9 +89,9 @@ const Sell = () => {
 
   // These are the options that will be used to populate the currency's <Select>
   const currencyOptions: currencyOptionsInterface[] = [
-    { value: "&#8358;", label: <span>&#8358;</span> },
-    { value: "&#36;", label: <span>&#36;</span> },
-    { value: "&#8364;", label: <span>&#8364;</span> },
+    { value: "8358", label: <span>&#8358;</span> },
+    { value: "36", label: <span>&#36;</span> },
+    { value: "8364", label: <span>&#8364;</span> },
   ];
 
   // Format the amount field, to add commas at appropriate places
@@ -185,8 +188,6 @@ const Sell = () => {
           throw new Error("User not signed in. fullName not found");
         }
 
-        console.log(imageName);
-
         if (blob) {
           // Append in 'photos' field. This will make the field an array
           theFormData.append("photos", blob, imageName);
@@ -198,7 +199,8 @@ const Sell = () => {
     });
   };
 
-  const postSell = async () => {
+  // This function sends a request to add a new product
+  const AddNewProduct = async () => {
     try {
       setRequestLoading(true);
       setErrorPostingSell("");
@@ -215,8 +217,6 @@ const Sell = () => {
         })
       );
 
-      console.log("photos", myFormData.getAll("photos"));
-
       // Then we append other text fields
       myFormData.append("category", categoryValue);
       myFormData.append("country", country);
@@ -226,7 +226,7 @@ const Sell = () => {
       myFormData.append("title", title);
       myFormData.append("description", description);
 
-      const response = await axiosClient.post("/api/sell", myFormData, {
+      const response = await axiosClient.post("/api/product", myFormData, {
         headers: {
           "content-type": "multipart/form-data",
         },
@@ -234,21 +234,21 @@ const Sell = () => {
 
       if (response.status === 200) {
         // Reset everything
-        // setCategoryValue("");
-        // setCategory(null);
-        // setCountry("");
-        // setState("");
+        setCategoryValue("");
+        setCategory(null);
+        setCountry("");
+        setState("");
 
-        // setCurrencyValue("");
-        // setCurrency(null);
-        // setAmount("");
-        // setTitle("");
-        // setDescription("");
+        setCurrencyValue("");
+        setCurrency(null);
+        setAmount("");
+        setTitle("");
+        setDescription("");
 
         setRequestLoading(false);
-        // setErrorPostingSell("");
+        setErrorPostingSell("");
 
-        console.log(response.data);
+        navigate(`/item/${response.data.productID}`);
       }
     } catch {
       setRequestLoading(false);
@@ -277,7 +277,7 @@ const Sell = () => {
             !requestLoading
           ) {
             // Send request to backend
-            postSell();
+            AddNewProduct();
           } else if (!user) {
             setErrorPostingSell("You must be signed in to continue");
           } else if (!user.phoneNumber) {

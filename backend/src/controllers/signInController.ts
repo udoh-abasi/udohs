@@ -8,7 +8,11 @@ import { ObjectId } from "mongodb";
 export const signInUserFunction = async (
   req: Request,
   res: Response,
-  theID: string | ObjectId | undefined
+  theID: string | ObjectId | undefined,
+  email: string = "",
+  fullName: string = "",
+  phoneNumber: string = "",
+  dateJoined: Date | null = null
 ) => {
   if (theID) {
     // Sign the token
@@ -28,13 +32,15 @@ export const signInUserFunction = async (
       sameSite: "strict",
     });
 
+    // If this 'signInUserFunction' function was called from the file 'signUpController.ts', 'req.user' will be undefined, however, the email, fullName, dateJoined, etc will be provided
+    // BUT if it was called from the 'SignIn' function below, then 'req.user' will be an object containing the user
     return res.status(200).json({
-      id: req.user?._id,
-      email: req.user?.email,
-      phoneNumber: req.user?.phoneNumber,
-      fullName: req.user?.fullName,
-      dateJoined: req.user?.dateJoined,
-      profilePicture: req.user?.profilePicture,
+      id: req.user?._id || theID,
+      email: req.user?.email || email,
+      phoneNumber: req.user?.phoneNumber || phoneNumber,
+      fullName: req.user?.fullName || fullName,
+      dateJoined: req.user?.dateJoined || dateJoined,
+      profilePicture: req.user?.profilePicture || null,
     });
   } else {
     console.log("Error no ID", theID);

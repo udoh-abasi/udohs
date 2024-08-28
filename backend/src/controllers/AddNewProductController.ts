@@ -6,7 +6,7 @@ import { imageDirectory } from "..";
 import sharp from "sharp";
 import fs from "fs";
 
-const Sell = async (req: Request, res: Response) => {
+const AddProduct = async (req: Request, res: Response) => {
   try {
     let { category, country, state, currency, amount, title, description } =
       req.body;
@@ -133,6 +133,9 @@ const Sell = async (req: Request, res: Response) => {
           })
         );
 
+        // Get the current date and time
+        const now = new Date();
+
         if (allCroppedImages.length) {
           // If a new user was inserted successfully, then 'result.acknowledged' will be true
           const result = await productsCollection.insertOne({
@@ -145,6 +148,7 @@ const Sell = async (req: Request, res: Response) => {
             title,
             description,
             photos: allCroppedImages,
+            dateAdded: now,
           });
 
           if (result.acknowledged) {
@@ -163,4 +167,4 @@ const Sell = async (req: Request, res: Response) => {
   }
 };
 
-export default Sell;
+export default AddProduct;

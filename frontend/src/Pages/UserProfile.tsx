@@ -9,6 +9,7 @@ import Loader from "../utils/loader";
 import { userSelector } from "../reduxFiles/selectors";
 import { useSelector } from "react-redux";
 import { profilePictureURL } from "../utils/axiosSetup";
+import { getDateJoined } from "../utils/getDateJoined";
 
 const UserProfile = () => {
   const theUserSelector = useSelector(userSelector);
@@ -16,18 +17,6 @@ const UserProfile = () => {
 
   // If the user visited the link 'http://localhost:5173/user', this will be true, but if they navigated from another page (like, while on the home page, they clicked 'Profile'), then this will be false
   const userIsLoading = theUserSelector.userLoading;
-
-  // This function returns the month and year, taking the 'Date' as an argument
-  const getDateJoined = (date: Date | undefined) => {
-    if (date) {
-      const theDateObject = new Date(date);
-
-      const month = theDateObject.toLocaleString("en-US", { month: "long" });
-      const year = theDateObject.getFullYear();
-
-      return `${month} ${year}`;
-    }
-  };
 
   return (
     <>
@@ -45,7 +34,7 @@ const UserProfile = () => {
                     <div className="relative">
                       <div className="rounded-full overflow-hidden mx-auto w-[120px] h-[120px] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]">
                         <img
-                          alt={``}
+                          alt={user?.fullName}
                           src={
                             user?.profilePicture
                               ? `${profilePictureURL}/${user.profilePicture}`

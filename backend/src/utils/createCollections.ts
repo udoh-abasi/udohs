@@ -132,6 +132,7 @@ const createCollections = async () => {
           "title",
           "description",
           "photos",
+          "dateAdded",
         ],
 
         // Define what each fields should contain
@@ -169,7 +170,7 @@ const createCollections = async () => {
 
           currency: {
             bsonType: "string",
-            enum: ["&#8358;", "&#36;", "&#8364;"],
+            enum: ["8358", "36", "8364"],
             description:
               "'currency' must be a string, must be a value from the enum and is required",
           },
@@ -194,6 +195,11 @@ const createCollections = async () => {
             items: { bsonType: "string" },
             description:
               "'photos' must be either an array of strings of strings and is required",
+          },
+
+          dateAdded: {
+            bsonType: "date",
+            description: "'Date added' must be a date object and is required",
           },
         },
       },

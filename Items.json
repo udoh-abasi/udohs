@@ -1,0 +1,33 @@
+[
+  {
+    "productOwnerID": "66c1984552b815d6d8f0da17",
+    "category": "vehicle",
+    "country": "Togo",
+    "state": "Sokoto",
+    "currency": "8358",
+    "amount": "767,567",
+    "title": "Added from new 4",
+    "description": "description from new 4",
+    "dateAdded": { "$date": "2024-08-25T10:02:49.171+00:00" },
+    "photos": [
+      "Udooh_2024-08-18T06-55-24.185Z.jpeg",
+      "Udooh_2024-08-18T06-55-24.195Z.jpeg"
+    ]
+  },
+
+  {
+    "productOwnerID": "66c1984552b815d6d8f0da17",
+    "category": "vehicle",
+    "country": "Togo",
+    "state": "Sokoto",
+    "currency": "8358",
+    "amount": "767,567",
+    "title": "Added from 3",
+    "description": "description from 3",
+    "dateAdded": { "$date": "2024-08-25T10:02:39.171+00:00" },
+    "photos": [
+      "Udooh_2024-08-18T06-55-24.185Z.jpeg",
+      "Udooh_2024-08-18T06-55-24.195Z.jpeg"
+    ]
+  }
+]

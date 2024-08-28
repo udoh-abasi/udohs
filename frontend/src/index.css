@@ -17,6 +17,8 @@
 
   background-color: var(--primary-color);
   color: white;
+
+  scroll-behavior: smooth;
 }
 
 /*Stop the body from scrolling when the menu is open, on smaller screens*/
