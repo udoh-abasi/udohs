@@ -147,6 +147,23 @@ const AllItems = () => {
     };
   }, [previousScrollPosition]);
 
+  const search = async () => {
+    try {
+      if (searchInputValue) {
+        setNextProductLoading(true);
+
+        const response = await axiosClient.get(
+          `/api/search?searchQuery=${searchInputValue}`
+        );
+
+        const responseProducts = response.data.products;
+        console.log(responseProducts);
+      }
+    } catch {
+      //
+    }
+  };
+
   return (
     <>
       {requestLoading ? (
@@ -178,6 +195,7 @@ const AllItems = () => {
                 aria-label="Submit"
                 title="Search"
                 className="text-3xl text-black absolute right-2 top-3"
+                onClick={search}
               >
                 <BiSearchAlt />
               </button>

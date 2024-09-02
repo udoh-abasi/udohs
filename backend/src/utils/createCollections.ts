@@ -114,7 +114,7 @@ const createCollections = async () => {
   }
 
   // Create the collection to store a products
-  await udohsDatabase.createCollection("products", {
+  const productsCollection = await udohsDatabase.createCollection("products", {
     validator: {
       $jsonSchema: {
         bsonType: "object", // NOTE: This means the collection will be an object
@@ -205,6 +205,12 @@ const createCollections = async () => {
       },
     },
   });
+
+  // Create a text index on the 'title' and 'description' fields, so that values in these fields can be searched
+  await productsCollection.createIndex(
+    [{ title: "text" }, { description: "text" }]
+    // { default_language: "none" } // By default, mongodb search ignores stop words like 'from', 'the' etc. This will make sure those stop words are not ignored
+  );
 };
 
 export default createCollections;

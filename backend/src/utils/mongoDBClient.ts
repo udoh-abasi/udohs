@@ -9,7 +9,8 @@ const connectToMongo = async () => {
     const mongoClient = new MongoClient(process.env.MONGODB_URI as string, {
       serverApi: {
         version: ServerApiVersion.v1,
-        strict: true,
+        // Set this to false, if not, we will get an error that says 'text indexes cannot be created with apiStrict: true'
+        strict: false,
         deprecationErrors: true,
       },
     });
