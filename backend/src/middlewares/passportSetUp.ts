@@ -162,6 +162,7 @@ const passportSetUp = () => {
                   fullName,
                   phoneNumber,
                   dateJoined,
+                  bag: [],
                 },
               },
               { upsert: true, returnDocument: "after" }

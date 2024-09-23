@@ -8,6 +8,16 @@ const GetOneProduct = async (req: Request, res: Response) => {
     const { productID } = req.params;
 
     if (productID) {
+      // Get the signed in user's bag
+      const signedInUserBag = req.user?.bag;
+
+      let inBag = false; // Defaults to false
+
+      // Check if the user is signed in, and if the the requested product is in the user's bag
+      if (signedInUserBag?.length) {
+        inBag = signedInUserBag.includes(productID);
+      }
+
       // Get the 'products' collection
       const productsCollection =
         udohsDatabase.collection<ProductCollection>("products");
@@ -29,7 +39,7 @@ const GetOneProduct = async (req: Request, res: Response) => {
         );
 
         if (productOwner) {
-          return res.status(200).json({ product, productOwner });
+          return res.status(200).json({ product, productOwner, inBag });
         }
       }
     }

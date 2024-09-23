@@ -1,5 +1,5 @@
 import { MdWorkspacePremium } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { IoChatboxOutline } from "react-icons/io5";
 import { FaBagShopping } from "react-icons/fa6";
@@ -14,6 +14,8 @@ import { getDateJoined } from "../utils/getDateJoined";
 const UserProfile = () => {
   const theUserSelector = useSelector(userSelector);
   const user = theUserSelector.userData;
+
+  const navigate = useNavigate();
 
   // If the user visited the link 'http://localhost:5173/user', this will be true, but if they navigated from another page (like, while on the home page, they clicked 'Profile'), then this will be false
   const userIsLoading = theUserSelector.userLoading;
@@ -96,6 +98,9 @@ const UserProfile = () => {
                 <button
                   type="button"
                   className="flex justify-center items-center gap-2 rounded-full ring-2 ring-white py-2 px-16 my-4 mt-6"
+                  onClick={() => {
+                    navigate("/bag");
+                  }}
                 >
                   {" "}
                   <FaBagShopping className="text-2xl" /> <span>View Bag</span>

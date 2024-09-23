@@ -17,6 +17,7 @@ router.get(
           fullName: req.user?.fullName,
           dateJoined: req.user?.dateJoined,
           profilePicture: req.user?.profilePicture,
+          bag: req.user?.bag,
         });
       } else {
         throw new Error("Something went wrong");

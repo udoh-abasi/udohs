@@ -15,6 +15,7 @@ import signInWithGoogleRouter from "./routers/signInWithGoogleRoute";
 import editUserRouter from "./routers/editUserRoute";
 import productRouter from "./routers/productRoute";
 import searchRouter from "./routers/searchRoute";
+import bagRouter from "./routers/bagRoute";
 import { connectToMongo } from "./utils/mongoDBClient";
 import createCollections from "./utils/createCollections";
 import cookieParser from "cookie-parser";
@@ -80,6 +81,7 @@ app.use("/api", [
   editUserRouter,
   productRouter,
   searchRouter,
+  bagRouter,
 ]);
 
 // Connect to mongodb, and if successful, create collections and start the app

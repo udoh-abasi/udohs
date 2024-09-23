@@ -42,7 +42,7 @@ const GetAllProduct = async (req: Request, res: Response) => {
       : "";
 
     // Get the maximum number of items to return
-    const limit = 1;
+    const limit = 5;
 
     // Get the 'products' collection
     const productsCollection =

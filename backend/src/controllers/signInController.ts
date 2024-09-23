@@ -41,6 +41,7 @@ export const signInUserFunction = async (
       fullName: req.user?.fullName || fullName,
       dateJoined: req.user?.dateJoined || dateJoined,
       profilePicture: req.user?.profilePicture || null,
+      bag: req.user?.bag || [],
     });
   } else {
     console.log("Error no ID", theID);

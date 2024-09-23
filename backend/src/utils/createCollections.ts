@@ -102,6 +102,14 @@ const createCollections = async () => {
               description:
                 "'Profile picture' must be either a string or null and is NOT required",
             },
+
+            // 'bag' holds the id of the products this user has added to their bag
+            bag: {
+              bsonType: "array",
+              items: { bsonType: "string" },
+              description:
+                "'bag' must be an array of strings and is NOT required",
+            },
           },
         },
       },
@@ -194,7 +202,7 @@ const createCollections = async () => {
             bsonType: "array",
             items: { bsonType: "string" },
             description:
-              "'photos' must be either an array of strings of strings and is required",
+              "'photos' must be either an array of strings and is required",
           },
 
           dateAdded: {

@@ -60,6 +60,7 @@ const SignUp = async (req: Request, res: Response) => {
           profilePicture: null,
           providerID: null,
           provider: "appUser",
+          bag: [], // This 'bag' will hold the ID of the products the user has added to their bag
           email,
           fullName,
           phoneNumber,

@@ -14,12 +14,11 @@ import axiosClient, {
 import { Product, User } from "../utils/tsInterface";
 import Loader from "../utils/loader";
 import { getDateJoined } from "../utils/getDateJoined";
+import { showForm } from "../utils/showOrHideSignUpAndRegisterForms";
 
 const ItemDisplay = () => {
   const theUserSelector = useSelector(userSelector);
   const user = theUserSelector.userData;
-
-  console.log(user);
 
   const navigate = useNavigate();
 
@@ -57,7 +56,18 @@ const ItemDisplay = () => {
     }
   }, [navigate, productID]);
 
-  const inBag = true;
+  // This holds the state, whether the currently logged in user has added this item to their bag
+  const [inBag, setInBag] = useState(false);
+
+  // This state controls when a user has sent a request to either add or remove an item from their bag
+  const [bagRequestLoading, setBagRequestLoading] = useState(false);
+
+  // This useEffect checks if the user is logged in. Then it confirms if this product is in the user's bag
+  useEffect(() => {
+    if (user && productID && user.bag?.includes(productID)) {
+      setInBag(true);
+    }
+  }, [user, productID]);
 
   return (
     <>
@@ -211,10 +221,35 @@ const ItemDisplay = () => {
                   </div>
 
                   <div className="flex justify-between p-4 mb-3">
-                    {inBag ? (
+                    {!inBag ? (
                       <button
                         type="button"
-                        className="text-lg rounded-lg hover:ring-2 ring-blue-500 text-blue-500 flex items-center gap-1 px-4 py-1 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+                        disabled={bagRequestLoading}
+                        className="text-lg rounded-lg hover:ring-2 ring-blue-500 text-blue-500 flex items-center gap-1 px-4 py-1 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)] disabled:cursor-not-allowed"
+                        onClick={async () => {
+                          // Check if the user is logged in, if not logged in, show the 'sign in' form
+                          if (user && !bagRequestLoading) {
+                            // Show the user the 'Remove from bag' button before even sending the request to add to bag
+                            setInBag(true);
+
+                            setBagRequestLoading(true);
+
+                            // Send request to add the product to the bag.
+                            const response = await axiosClient.put("/api/bag", {
+                              productID,
+                            });
+
+                            // If there was an error and the product was not added to the bag, we want the 'Add to bag' button to show again
+                            if (response.status !== 200) {
+                              setInBag(false);
+                            }
+
+                            setBagRequestLoading(false);
+                          } else if (!user) {
+                            // If user is not logged in, show the 'sign in' form
+                            showForm("#sign_IN_wrapper");
+                          }
+                        }}
                       >
                         <TbShoppingBagHeart className="text-2xl" />
                         <span>Add to bag</span>
@@ -222,7 +257,32 @@ const ItemDisplay = () => {
                     ) : (
                       <button
                         type="button"
-                        className="text-sm rounded-lg hover:ring-2 ring-red-500 text-red-500 flex items-center gap-1 px-4 py-3 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+                        disabled={bagRequestLoading}
+                        className="text-sm rounded-lg hover:ring-2 ring-red-500 text-red-500 flex items-center gap-1 px-4 py-3 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)] disabled:cursor-not-allowed"
+                        onClick={async () => {
+                          // Check if the user is logged in, if not logged in, show the 'Add to bag' button
+                          if (user && !bagRequestLoading) {
+                            // Show the user the 'Add to bag' button before even sending the request to remove from bag
+                            setInBag(false);
+
+                            setBagRequestLoading(true);
+
+                            // Send request to remove the product to the bag.
+                            const response = await axiosClient.delete(
+                              `/api/bag/${productID}`
+                            );
+
+                            // If there was an error and the product was not removed from the bag, we want the 'Remove from bag' button to show again
+                            if (response.status !== 200) {
+                              setInBag(true);
+                            }
+
+                            setBagRequestLoading(false);
+                          } else if (!user) {
+                            // If user is not logged in,  show the 'Add to bag' button
+                            setInBag(false);
+                          }
+                        }}
                       >
                         <TbShoppingBagX className="text-2xl" />
                         <span>Remove from bag</span>

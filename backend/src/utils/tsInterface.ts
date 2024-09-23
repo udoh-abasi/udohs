@@ -10,6 +10,7 @@ export interface UserCollection {
   fullName: string;
   dateJoined: Date;
   profilePicture?: string | null;
+  bag: string[];
 }
 
 export interface EmailAndVerificationCodeCollection {

@@ -18,6 +18,7 @@ import Bag from "./Pages/Bag";
 import PageNotFound from "./utils/PageNotFound";
 import { useSelector } from "react-redux";
 import { userSelector } from "./reduxFiles/selectors";
+import Search from "./Pages/Search";
 
 const PrivateRoute = () => {
   const user = useSelector(userSelector);
@@ -53,7 +54,11 @@ function App() {
 
           <Route path="/sell" element={<Sell />} />
 
-          <Route path="/bag" element={<Bag />} />
+          <Route path="/bag" element={<PrivateRoute />}>
+            <Route path="/bag" element={<Bag />} />
+          </Route>
+
+          <Route path="/search" element={<Search />} />
 
           <Route path="/*" element={<PageNotFound />} />
         </Routes>

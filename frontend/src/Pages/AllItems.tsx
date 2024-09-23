@@ -147,23 +147,6 @@ const AllItems = () => {
     };
   }, [previousScrollPosition]);
 
-  const search = async () => {
-    try {
-      if (searchInputValue) {
-        setNextProductLoading(true);
-
-        const response = await axiosClient.get(
-          `/api/search?searchQuery=${searchInputValue}`
-        );
-
-        const responseProducts = response.data.products;
-        console.log(responseProducts);
-      }
-    } catch {
-      //
-    }
-  };
-
   return (
     <>
       {requestLoading ? (
@@ -176,6 +159,7 @@ const AllItems = () => {
             className="w-full flex justify-center p-4 pt-16 pb-8"
             onSubmit={(e) => {
               e.preventDefault();
+              navigate(`/search?query=${searchInputValue}`);
             }}
           >
             <div className="relative w-full max-w-[550px] text-black">
@@ -195,7 +179,6 @@ const AllItems = () => {
                 aria-label="Submit"
                 title="Search"
                 className="text-3xl text-black absolute right-2 top-3"
-                onClick={search}
               >
                 <BiSearchAlt />
               </button>

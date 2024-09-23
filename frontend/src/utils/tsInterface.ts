@@ -88,6 +88,7 @@ export interface User {
   fullName: string;
   dateJoined: Date;
   profilePicture?: string | null;
+  bag: string[];
 }
 
 // This is the product interface
