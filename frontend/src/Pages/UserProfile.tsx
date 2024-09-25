@@ -8,8 +8,13 @@ import { hideForm, showForm } from "../utils/showOrHideSignUpAndRegisterForms";
 import Loader from "../utils/loader";
 import { userSelector } from "../reduxFiles/selectors";
 import { useSelector } from "react-redux";
-import { profilePictureURL } from "../utils/axiosSetup";
+import axiosClient, {
+  productImagesURL,
+  profilePictureURL,
+} from "../utils/axiosSetup";
 import { getDateJoined } from "../utils/getDateJoined";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Product } from "../utils/tsInterface";
 
 const UserProfile = () => {
   const theUserSelector = useSelector(userSelector);
@@ -17,8 +22,18 @@ const UserProfile = () => {
 
   const navigate = useNavigate();
 
+  // This will be used to set the data of useQuery (using queryClient.setQueryData). Similar to 'setData', when using 'useState'
+  const queryClient = useQueryClient();
+
   // If the user visited the link 'http://localhost:5173/user', this will be true, but if they navigated from another page (like, while on the home page, they clicked 'Profile'), then this will be false
   const userIsLoading = theUserSelector.userLoading;
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["userAdverts"],
+    queryFn: async () => {
+      return (await axiosClient.get("/api/useradverts")).data;
+    },
+  });
 
   return (
     <>
@@ -113,51 +128,104 @@ const UserProfile = () => {
                 Adverts
               </h2>
 
-              <ul className="p-4 pt-0 min-[460px]:grid grid-cols-1 max-[599.9px]:grid-cols-2 min-[810px]:grid-cols-2 min-[1150px]:grid-cols-3 gap-[16px] justify-items-center">
-                <li className="max-[460px]:mb-8 rounded-2xl shadow-[0px_5px_15px_rgba(0,0,0,0.35)]">
-                  <Link
-                    to=""
-                    className="block px-2 py-5 relative hover:bg-[#d1b5a6] rounded-t-2xl"
-                  >
-                    <figure>
-                      <div>
-                        <img
-                          alt=""
-                          src="/heroImages/Hero photo-small.webp"
-                          className=" rounded-2xl"
-                        />
-                      </div>
+              {isLoading ? (
+                <div className="flex justify-center">
+                  <Loader />
+                </div>
+              ) : (
+                <></>
+              )}
 
-                      <figcaption className="text-center mt-4">
-                        <p className="font-bold text-xl mb-4">$2,000</p>
-                        <p className="font-bold text-xl" id="one-line-ellipsis">
-                          Rolls Royce
-                        </p>
+              {data && data.length ? (
+                <ul className="p-4 pt-0 min-[460px]:grid grid-cols-1 max-[599.9px]:grid-cols-2 min-[810px]:grid-cols-2 min-[1150px]:grid-cols-3 gap-[16px] justify-items-center">
+                  {data.map((product: Product) => {
+                    const heroPhoto = product.photos[0];
 
-                        <p className="absolute top-0 text-sm font-bold">
-                          <em>Abuja, Nigeria</em>
-                        </p>
-                      </figcaption>
-                    </figure>
-                  </Link>
+                    return (
+                      <li
+                        className="max-[460px]:mb-8 rounded-2xl shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+                        key={product._id}
+                      >
+                        <Link
+                          to={`/item/${product._id}`}
+                          className="block px-2 py-5 relative hover:bg-[#d1b5a6] rounded-t-2xl"
+                        >
+                          <figure>
+                            <div>
+                              <img
+                                alt=""
+                                src={`${productImagesURL}/${heroPhoto}`}
+                                className=" rounded-2xl"
+                              />
+                            </div>
 
-                  <div className="flex justify-between p-4 border-t-2 border-white">
-                    <button
-                      type="button"
-                      className="block text-lg rounded-lg hover:ring-2 ring-blue-500 text-blue-500 px-4 py-1 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
-                    >
-                      Edit
-                    </button>
+                            <figcaption className="text-center mt-4">
+                              <p className="font-bold text-xl mb-4">
+                                {product.currency}
+                                {product.amount}
+                              </p>
+                              <p
+                                className="font-bold text-xl"
+                                id="one-line-ellipsis"
+                              >
+                                {product.title}
+                              </p>
 
-                    <button
-                      type="button"
-                      className="block text-sm rounded-lg hover:ring-2 ring-red-500 text-red-500 px-3 py-1 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </li>
-              </ul>
+                              <p className="absolute top-0 text-sm font-bold">
+                                <em>
+                                  {product.state}, {product.country}
+                                </em>
+                              </p>
+                            </figcaption>
+                          </figure>
+                        </Link>
+
+                        <div className="flex justify-between p-4 border-t-2 border-white">
+                          <button
+                            type="button"
+                            className="block text-lg rounded-lg hover:ring-2 ring-blue-500 text-blue-500 px-4 py-1 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="block text-sm rounded-lg hover:ring-2 ring-red-500 text-red-500 px-3 py-1 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+                            onClick={async () => {
+                              // First, we want to quickly remove the deleted data from the frontend
+                              const newData = data.filter(
+                                (eachProduct: Product) =>
+                                  eachProduct._id !== product._id
+                              );
+
+                              // NOTE: This sets the useQuery's data to our new data
+                              queryClient.setQueryData(
+                                ["userAdverts"],
+                                newData
+                              );
+
+                              // Then we send a request to the backend to delete the data
+                              try {
+                                await axiosClient.delete(
+                                  `/api/product/${product._id}`
+                                );
+                              } catch {
+                                // Do nothing
+                              }
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="text-center font-bold italic text-black">
+                  You have NOT added an advert yet.
+                </p>
+              )}
             </section>
           </div>
 

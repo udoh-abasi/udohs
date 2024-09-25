@@ -16,6 +16,8 @@ import editUserRouter from "./routers/editUserRoute";
 import productRouter from "./routers/productRoute";
 import searchRouter from "./routers/searchRoute";
 import bagRouter from "./routers/bagRoute";
+import trendingSalesRouter from "./routers/trendingSalesRoute";
+import userAdverts from "./routers/userAdverts";
 import { connectToMongo } from "./utils/mongoDBClient";
 import createCollections from "./utils/createCollections";
 import cookieParser from "cookie-parser";
@@ -82,6 +84,8 @@ app.use("/api", [
   productRouter,
   searchRouter,
   bagRouter,
+  trendingSalesRouter,
+  userAdverts,
 ]);
 
 // Connect to mongodb, and if successful, create collections and start the app

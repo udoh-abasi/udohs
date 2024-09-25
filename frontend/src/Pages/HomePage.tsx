@@ -1,9 +1,21 @@
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import axiosClient, { productImagesURL } from "../utils/axiosSetup";
+import Loader from "../utils/loader";
+import { Product } from "../utils/tsInterface";
 
 const HomePage = () => {
   const navigate = useNavigate();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["trendingSales"],
+    queryFn: async () => {
+      return (await axiosClient.get("/api/trendingsales")).data;
+    },
+  });
+
   return (
     <main>
       <div className="grid grid-cols-1 grid-rows-1">
@@ -16,7 +28,7 @@ const HomePage = () => {
           showStatus={false}
           swipeable={false}
           useKeyboardArrows={false}
-          animationHandler="slide"
+          animationHandler="fade"
           swipeScrollTolerance={5}
           interval={6000}
           transitionTime={500}
@@ -102,119 +114,58 @@ const HomePage = () => {
           Trending sells
         </h2>
 
-        <ul className="p-4 min-[460px]:grid grid-cols-2 min-[700px]:grid-cols-3 min-[1000px]:grid-cols-4 gap-[16px] justify-items-center">
-          <li className="max-[460px]:mb-8">
-            <Link
-              to=""
-              className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
-            >
-              <figure>
-                <div>
-                  <img
-                    alt=""
-                    src="/heroImages/Hero photo-small.webp"
-                    className=" rounded-2xl"
-                  />
-                </div>
+        {isLoading ? (
+          <div className="flex justify-center">
+            <Loader />
+          </div>
+        ) : (
+          <></>
+        )}
 
-                <figcaption className="text-center mt-4">
-                  <p className="font-bold text-xl mb-4">$2,000</p>
-                  <p className="font-bold text-xl" id="one-line-ellipsis">
-                    Toyota Corolla 2024 Model Corolla 2024 Model
-                  </p>
+        {data ? (
+          <ul className="p-4 min-[460px]:grid grid-cols-2 min-[700px]:grid-cols-3 min-[1000px]:grid-cols-4 gap-[16px] justify-items-center">
+            {data.map((product: Product) => {
+              const heroPhoto = product.photos[0];
 
-                  <p className="absolute top-0 text-sm font-bold">
-                    <em>Abuja, Nigeria</em>
-                  </p>
-                </figcaption>
-              </figure>
-            </Link>
-          </li>
+              return (
+                <li className="max-[460px]:mb-8" key={product._id}>
+                  <Link
+                    to={`/item/${product._id}`}
+                    className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+                  >
+                    <figure>
+                      <div>
+                        <img
+                          alt=""
+                          src={`${productImagesURL}/${heroPhoto}`}
+                          className=" rounded-2xl"
+                        />
+                      </div>
 
-          <li className="max-[460px]:mb-8">
-            <Link
-              to=""
-              className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
-            >
-              <figure>
-                <div>
-                  <img
-                    alt=""
-                    src="/heroImages/Hero photo-small.webp"
-                    className=" rounded-2xl"
-                  />
-                </div>
+                      <figcaption className="text-center mt-4">
+                        <p className="font-bold text-xl mb-4">
+                          {product.currency}
+                          {product.amount}
+                        </p>
+                        <p className="font-bold text-xl" id="one-line-ellipsis">
+                          {product.title}
+                        </p>
 
-                <figcaption className="text-center mt-4">
-                  <p className="font-bold text-xl mb-4">$2,000</p>
-                  <p className="font-bold text-xl" id="one-line-ellipsis">
-                    Toyota Corolla 2024 Model Corolla 2024 Model
-                  </p>
-
-                  <p className="absolute top-0 text-sm font-bold">
-                    <em>Abuja, Nigeria</em>
-                  </p>
-                </figcaption>
-              </figure>
-            </Link>
-          </li>
-
-          <li className="max-[460px]:mb-8">
-            <Link
-              to=""
-              className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
-            >
-              <figure>
-                <div>
-                  <img
-                    alt=""
-                    src="/heroImages/Hero photo-small.webp"
-                    className=" rounded-2xl"
-                  />
-                </div>
-
-                <figcaption className="text-center mt-4">
-                  <p className="font-bold text-xl mb-4">$2,000</p>
-                  <p className="font-bold text-xl" id="one-line-ellipsis">
-                    Toyota Corolla 2024 Model Corolla 2024 Model
-                  </p>
-
-                  <p className="absolute top-0 text-sm font-bold">
-                    <em>Abuja, Nigeria</em>
-                  </p>
-                </figcaption>
-              </figure>
-            </Link>
-          </li>
-
-          <li className="max-[460px]:mb-8">
-            <Link
-              to=""
-              className="block rounded-2xl px-2 py-5 relative hover:bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
-            >
-              <figure>
-                <div>
-                  <img
-                    alt=""
-                    src="/heroImages/Hero photo-small.webp"
-                    className=" rounded-2xl"
-                  />
-                </div>
-
-                <figcaption className="text-center mt-4">
-                  <p className="font-bold text-xl mb-4">$2,000</p>
-                  <p className="font-bold text-xl" id="one-line-ellipsis">
-                    Toyota Corolla 2024 Model Corolla 2024 Model
-                  </p>
-
-                  <p className="absolute top-0 text-sm font-bold">
-                    <em>Abuja, Nigeria</em>
-                  </p>
-                </figcaption>
-              </figure>
-            </Link>
-          </li>
-        </ul>
+                        <p className="absolute top-0 text-sm font-bold">
+                          <em>
+                            {product.state}, {product.country}
+                          </em>
+                        </p>
+                      </figcaption>
+                    </figure>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <></>
+        )}
 
         <div className="flex justify-center p-4 mt-8">
           <button

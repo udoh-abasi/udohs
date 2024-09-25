@@ -30,10 +30,7 @@ const DeleteBagItem = async (req: Request, res: Response) => {
           { upsert: false }
         );
 
-        console.log(updateBag);
-
         if (updateBag.modifiedCount === 1) {
-          console.log("In here");
           return res.sendStatus(200);
         }
       }

@@ -4,6 +4,7 @@ import multer from "multer";
 import AddProduct from "../controllers/AddNewProductController";
 import GetOneProduct from "../controllers/GetOneProductController";
 import GetAllProduct from "../controllers/GetAllProductController";
+import DeleteProduct from "../controllers/deleteProductController";
 
 const router = Router();
 
@@ -41,5 +42,12 @@ router.get("/product/:productID", GetOneProduct);
 
 // This route returns ALL product requested by the user
 router.get("/product", GetAllProduct);
+
+// This route returns ALL product requested by the user
+router.delete(
+  "/product/:productID",
+  passport.authenticate("jwt", { session: false }),
+  DeleteProduct
+);
 
 export default router;

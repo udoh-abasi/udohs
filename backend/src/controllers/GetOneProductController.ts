@@ -39,7 +39,27 @@ const GetOneProduct = async (req: Request, res: Response) => {
         );
 
         if (productOwner) {
-          return res.status(200).json({ product, productOwner, inBag });
+          // Get 4 similar products to display on the page
+          // Since we do not want to include the product that the user actually requested for in the similar products list, we used '$ne' (not equal) operator to exclude it
+          // The command '_id: { $ne: product._id }' will exclude the product from the final result
+          const similarProducts = await productsCollection
+            .find(
+              { category: product.category, _id: { $ne: product._id } },
+              {
+                projection: {
+                  productOwnerID: 0,
+                  description: 0,
+                  dateAdded: 0,
+                  category: 0,
+                },
+              }
+            )
+            .limit(4)
+            .toArray();
+
+          return res
+            .status(200)
+            .json({ product, productOwner, inBag, similarProducts });
         }
       }
     }
