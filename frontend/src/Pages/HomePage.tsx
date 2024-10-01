@@ -30,8 +30,8 @@ const HomePage = () => {
           useKeyboardArrows={false}
           animationHandler="fade"
           swipeScrollTolerance={5}
-          interval={6000}
-          transitionTime={500}
+          interval={5000}
+          transitionTime={1000}
           stopOnHover={false}
           // centerMode={true}
           // centerSlidePercentage={93}
@@ -144,7 +144,7 @@ const HomePage = () => {
 
                       <figcaption className="text-center mt-4">
                         <p className="font-bold text-xl mb-4">
-                          {product.currency}
+                          {String.fromCharCode(Number(product.currency))}
                           {product.amount}
                         </p>
                         <p className="font-bold text-xl" id="one-line-ellipsis">

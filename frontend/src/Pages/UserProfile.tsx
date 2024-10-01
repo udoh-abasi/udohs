@@ -161,7 +161,7 @@ const UserProfile = () => {
 
                             <figcaption className="text-center mt-4">
                               <p className="font-bold text-xl mb-4">
-                                {product.currency}
+                                {String.fromCharCode(Number(product.currency))}
                                 {product.amount}
                               </p>
                               <p
@@ -184,6 +184,9 @@ const UserProfile = () => {
                           <button
                             type="button"
                             className="block text-lg rounded-lg hover:ring-2 ring-blue-500 text-blue-500 px-4 py-1 font-bold bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]"
+                            onClick={() => {
+                              navigate(`/edit/${product._id}`);
+                            }}
                           >
                             Edit
                           </button>

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { udohsDatabase } from "../utils/mongoDBClient";
-import { ProductCollection, UserCollection } from "../utils/tsInterface";
+import { ProductCollection } from "../utils/tsInterface";
 import { ObjectId } from "mongodb";
 
 const DeleteProduct = async (req: Request, res: Response) => {

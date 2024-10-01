@@ -34,6 +34,12 @@ export interface CountryAndStateProps {
   setParentState: (state: string) => void;
 }
 
+export interface CountryAndStateForEditProps {
+  setParentCountry: (country: string) => void;
+  setParentState: (state: string) => void;
+  productData: Product;
+}
+
 // This is used on the 'signUpWithGoogle.tsx' to define the props
 export interface SignUpWithGoogleProps {
   text: string;

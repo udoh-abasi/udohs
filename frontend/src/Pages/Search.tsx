@@ -203,7 +203,7 @@ const Search = () => {
 
                             <figcaption className="text-center mt-4">
                               <p className="font-bold text-xl mb-4">
-                                {product.currency}
+                                {String.fromCharCode(Number(product.currency))}
                                 {product.amount}
                               </p>
                               <p

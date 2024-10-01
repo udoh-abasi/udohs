@@ -5,6 +5,7 @@ import AddProduct from "../controllers/AddNewProductController";
 import GetOneProduct from "../controllers/GetOneProductController";
 import GetAllProduct from "../controllers/GetAllProductController";
 import DeleteProduct from "../controllers/deleteProductController";
+import EditProduct from "../controllers/EditProductController";
 
 const router = Router();
 
@@ -35,6 +36,14 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   photosUpload.array("photos"),
   AddProduct
+);
+
+// This is the put route that updates a new product
+router.put(
+  "/product/:productID",
+  passport.authenticate("jwt", { session: false }),
+  photosUpload.array("newlyAddedPhotos"),
+  EditProduct
 );
 
 // This route returns the individual product requested by the user
