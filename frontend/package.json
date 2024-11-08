@@ -23,6 +23,7 @@
     "react-select": "^5.8.0",
     "react-sortablejs": "^6.1.4",
     "react-textarea-autosize": "^8.5.3",
+    "socket.io-client": "^4.8.0",
     "uuid4": "^2.0.3"
   },
   "devDependencies": {

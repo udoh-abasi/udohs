@@ -87,6 +87,7 @@ export interface ImageCropperProps {
 
 // This is the user interface
 export interface User {
+  id?: string;
   _id?: string;
   email: string;
   password: string;
@@ -117,3 +118,35 @@ export interface Product {
     | "properties"
     | "others";
 }
+
+// This is used on the 'chatContacts.tsx' page, to define what each chat should be.
+export interface chat {
+  _id?: string;
+  lastMessage: string;
+  readByReceiver: boolean;
+  lastMessageDateAndTime: string;
+  productTitle: string;
+  otherPartnerID: string;
+  isCurrentUserTheLastMessageReceiver: boolean;
+  otherPartnerFullName: string;
+  otherPartnerProfilePicture: string | null;
+  receiverID: string;
+  lastMessageID: string;
+}
+
+// This is the interface for the actual chat Message. This interface is used in the 'chatScreen.tsx'.
+export interface theMessageInterface {
+  _id: string;
+  senderID: string;
+  receiverID: string;
+  productID: string;
+  message: string;
+  dateAndTime: string;
+  readByReceiver: boolean;
+}
+
+// // So, we grouped the messages b/w two partners, based on the date it was sent, and the actual messages that were sent on that date
+// export interface groupedMessages {
+//   _id: string; // This field holds the date the messages were sent
+//   messages: theMessage[]; // This is a list of all the messages that were sent on that date
+// }

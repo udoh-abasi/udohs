@@ -45,9 +45,13 @@ function App() {
 
           <Route path="/item/:productID" element={<ItemDisplay />} />
 
-          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat" element={<PrivateRoute />}>
+            <Route path="/chat" element={<Chat />} />
+          </Route>
 
-          <Route path="/chat/1" element={<ChatScreen />} />
+          <Route path="/chat/:chatID" element={<PrivateRoute />}>
+            <Route path="/chat/:chatID" element={<ChatScreen />} />
+          </Route>
 
           <Route path="/user" element={<PrivateRoute />}>
             <Route path="/user" element={<UserProfile />} />

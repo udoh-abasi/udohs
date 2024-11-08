@@ -39,3 +39,22 @@ export interface ProductCollection {
     | "properties"
     | "others";
 }
+
+export interface chatMessageCollection {
+  _id?: string | ObjectId;
+  senderID: ObjectId;
+  receiverID: ObjectId;
+  productID: ObjectId;
+  message: string;
+  dateAndTime: Date;
+  readByReceiver: boolean;
+}
+
+export interface chatsCollection {
+  _id?: string | ObjectId;
+  chatPartner1: ObjectId;
+  chatPartner2: ObjectId;
+  productID: ObjectId;
+  messages: ObjectId[];
+  lastMessageId: ObjectId;
+}

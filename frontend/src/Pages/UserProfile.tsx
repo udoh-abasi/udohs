@@ -104,6 +104,9 @@ const UserProfile = () => {
                 <button
                   type="button"
                   className="flex justify-center items-center gap-2 rounded-full ring-2 ring-white py-2 px-16 my-4 mt-6"
+                  onClick={() => {
+                    navigate("/chat");
+                  }}
                 >
                   {" "}
                   <IoChatboxOutline className="text-2xl" />{" "}

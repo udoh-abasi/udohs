@@ -1,0 +1,73 @@
+[
+  {
+    "senderID": { "$oid": "66f1675f6965d3bd910943d8" },
+    "receiverID": { "$oid": "67021a5890f8b6ed17771bd5" },
+    "productID": { "$oid": "66f6b6c50943865aedd01cf5" },
+    "message": "Hello",
+    "dateAndTime": { "$date": "2024-08-25T10:11:39.171+00:00" },
+    "readByReceiver": false
+  },
+
+  {
+    "senderID": { "$oid": "66f1675f6965d3bd910943d8" },
+    "receiverID": { "$oid": "67021a5890f8b6ed17771bd5" },
+    "productID": { "$oid": "66f6b6c50943865aedd01cf5" },
+    "message": "Hi",
+    "dateAndTime": { "$date": "2024-08-25T10:12:39.171+00:00" },
+    "readByReceiver": false
+  },
+
+  {
+    "senderID": { "$oid": "67021a5890f8b6ed17771bd5" },
+    "receiverID": { "$oid": "66f1675f6965d3bd910943d8" },
+    "productID": { "$oid": "66f6b6c50943865aedd01cf5" },
+    "message": "How are you",
+    "dateAndTime": { "$date": "2024-08-25T10:13:39.171+00:00" },
+    "readByReceiver": false
+  },
+
+  {
+    "senderID": { "$oid": "67021a5890f8b6ed17771bd5" },
+    "receiverID": { "$oid": "66f1675f6965d3bd910943d8" },
+    "productID": { "$oid": "66f6b6c50943865aedd01cf5" },
+    "message": "Hope you are good",
+    "dateAndTime": { "$date": "2024-08-25T10:14:39.171+00:00" },
+    "readByReceiver": false
+  },
+
+  {
+    "senderID": { "$oid": "670d0a61a8b7a17e96b828f6" },
+    "receiverID": { "$oid": "67021a5890f8b6ed17771bd5" },
+    "productID": { "$oid": "66f6b6c50943865aedd01cf5" },
+    "message": "Hello",
+    "dateAndTime": { "$date": "2024-08-25T10:11:39.171+00:00" },
+    "readByReceiver": false
+  },
+
+  {
+    "senderID": { "$oid": "66f1675f6965d3bd910943d8" },
+    "receiverID": { "$oid": "670d0a61a8b7a17e96b828f6" },
+    "productID": { "$oid": "66f6b6c50943865aedd01cf5" },
+    "message": "Hi",
+    "dateAndTime": { "$date": "2024-08-25T10:12:39.171+00:00" },
+    "readByReceiver": false
+  },
+
+  {
+    "senderID": { "$oid": "670d0a61a8b7a17e96b828f6" },
+    "receiverID": { "$oid": "66f1675f6965d3bd910943d8" },
+    "productID": { "$oid": "66f6b6c50943865aedd01cf5" },
+    "message": "How are you",
+    "dateAndTime": { "$date": "2024-08-25T10:13:39.171+00:00" },
+    "readByReceiver": false
+  },
+
+  {
+    "senderID": { "$oid": "67021a5890f8b6ed17771bd5" },
+    "receiverID": { "$oid": "670d0a61a8b7a17e96b828f6" },
+    "productID": { "$oid": "66f6b6c50943865aedd01cf5" },
+    "message": "Hope you are good",
+    "dateAndTime": { "$date": "2024-08-25T10:14:39.171+00:00" },
+    "readByReceiver": false
+  }
+]

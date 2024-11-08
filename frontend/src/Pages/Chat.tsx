@@ -5,17 +5,6 @@ const Chat = () => {
     <main className="min-h-screen p-4 min-[700px]:flex gap-3 relative">
       <div className="flex-[0_0_40%]">
         <ChatContacts />
-        <ChatContacts />
-        <ChatContacts />
-        <ChatContacts />
-        <ChatContacts />
-        <ChatContacts />
-        <ChatContacts />
-        <ChatContacts />
-        <ChatContacts />
-        <ChatContacts />
-        <ChatContacts />
-        <ChatContacts />
       </div>
 
       <picture

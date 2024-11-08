@@ -1,6 +1,6 @@
 import { Carousel } from "react-responsive-carousel";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { IoChatboxOutline, IoLocationOutline } from "react-icons/io5";
+import { IoChatboxOutline, IoLocationOutline, IoSend } from "react-icons/io5";
 import { MdWorkspacePremium } from "react-icons/md";
 import { TbShoppingBagHeart } from "react-icons/tb";
 import { TbShoppingBagX } from "react-icons/tb";
@@ -15,6 +15,8 @@ import { Product, User } from "../utils/tsInterface";
 import Loader from "../utils/loader";
 import { getDateJoined } from "../utils/getDateJoined";
 import { showForm } from "../utils/showOrHideSignUpAndRegisterForms";
+import { AiFillWarning } from "react-icons/ai";
+import TextareaAutosize from "react-textarea-autosize";
 
 const ItemDisplay = () => {
   const theUserSelector = useSelector(userSelector);
@@ -73,6 +75,51 @@ const ItemDisplay = () => {
       setInBag(true);
     }
   }, [user, productID]);
+
+  const [startChatLoading, setStartChatLoading] = useState(false);
+  const [errorStartingChat, setErrorStartingChat] = useState(false);
+
+  // This holds the messages that the user types on the field (i.e, messages to be sent)
+  const [message, setMessage] = useState("");
+
+  const [showChatForm, setShowChatForm] = useState(false);
+
+  // This function checks if a user is logged in. If the logged in user is NOT the one that posted the item, then it shows the 'start chat' button
+  // If the logged in user posted the item, it will NOT shows the 'start chat' button
+  // If no user is logged in at all, it will shows the 'start chat' button, but when clicked, the user will see the log-in form instead
+  const startChatButton = () => {
+    if (user?.id) {
+      if (productOwner?._id !== user.id) {
+        return (
+          <button
+            type="button"
+            className="flex justify-center items-center gap-2 rounded-full ring-2 ring-white py-2 px-14 my-4 mt-6"
+            onClick={async () => {
+              setShowChatForm(true);
+            }}
+          >
+            <IoChatboxOutline className="text-2xl" /> <span>Start Chat</span>
+          </button>
+        );
+      } else {
+        return <></>;
+      }
+    } else {
+      return (
+        <button
+          type="button"
+          className="flex justify-center items-center gap-2 rounded-full ring-2 ring-white py-2 px-14 my-4 mt-6"
+          onClick={() => {
+            // Since the user is not logged in, show the 'sign in' form
+            showForm("#sign_IN_wrapper");
+          }}
+        >
+          {" "}
+          <IoChatboxOutline className="text-2xl" /> <span>Start Chat</span>
+        </button>
+      );
+    }
+  };
 
   return (
     <>
@@ -136,16 +183,78 @@ const ItemDisplay = () => {
                     {productOwner?.email}
                   </Link>
 
-                  <div className="flex justify-center font-bold">
-                    <button
-                      type="button"
-                      className="flex justify-center items-center gap-2 rounded-full ring-2 ring-white py-2 px-14 my-4 mt-6"
-                    >
-                      {" "}
-                      <IoChatboxOutline className="text-2xl" />{" "}
-                      <span>Start Chat</span>
-                    </button>
-                  </div>
+                  {!showChatForm ? (
+                    <div className="flex justify-center font-bold">
+                      {startChatButton()}
+                    </div>
+                  ) : (
+                    <form className="p-1 mt-4 flex gap-3 sticky bottom-0 rounded-2xl bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]">
+                      <TextareaAutosize
+                        value={message}
+                        onChange={(e) => {
+                          setMessage(e.target.value);
+                        }}
+                        className="resize-none text-black w-full p-2 border-0 rounded-3xl max-h-[150px] outline-none"
+                        placeholder="Write a message..."
+                      />
+
+                      {startChatLoading ? (
+                        <div className="self-end">
+                          <Loader />
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            aria-label="Send"
+                            title="Send"
+                            className="text-4xl text-[green] self-end"
+                            onClick={async () => {
+                              if (message.trim() && !startChatLoading) {
+                                // At the backend, if the chat already exist, return the id so the frontend can switch to,
+                                // If the chat does not exist, create one
+                                try {
+                                  setStartChatLoading(true);
+                                  setErrorStartingChat(false);
+
+                                  const response = await axiosClient.post(
+                                    "/api/startchat",
+                                    {
+                                      productID,
+                                      productOwnerID: productOwner?._id,
+                                      message: message.trim(),
+                                    }
+                                  );
+
+                                  if (response.status === 200) {
+                                    setStartChatLoading(false);
+                                    setErrorStartingChat(false);
+
+                                    const chatID = await response.data;
+
+                                    // Push the user to the chat page, with that ID
+                                    navigate(`/chat/${chatID}`);
+                                  }
+                                } catch {
+                                  setStartChatLoading(false);
+                                  setErrorStartingChat(true);
+                                }
+                              }
+                            }}
+                          >
+                            <IoSend />
+                          </button>
+                        </>
+                      )}
+                    </form>
+                  )}
+
+                  {errorStartingChat && (
+                    <p className="text-red-500 text-sm text-center mt-4 font-bold">
+                      <AiFillWarning className="inline text-lg mr-1" />
+                      Something went wrong and we could not start chat
+                    </p>
+                  )}
                 </article>
 
                 <article className="mb-4 p-4 rounded-2xl bg-[#d1b5a6] shadow-[0px_5px_15px_rgba(0,0,0,0.35)]">

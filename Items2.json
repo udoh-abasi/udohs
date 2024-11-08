@@ -1,0 +1,95 @@
+[
+  {
+    "chatPartner1": {
+      "$oid": "66f1675f6965d3bd910943d8"
+    },
+    "chatPartner2": {
+      "$oid": "670d0a61a8b7a17e96b828f6"
+    },
+    "productID": {
+      "$oid": "66f6b6c50943865aedd01cf5"
+    },
+    "messages": [
+      {
+        "$oid": "670d0b56af48b35cc7d21e72"
+      },
+      {
+        "$oid": "670d0b56af48b35cc7d21e73"
+      },
+      {
+        "$oid": "670d0b56af48b35cc7d21e74"
+      },
+      {
+        "$oid": "670d0b56af48b35cc7d21e75"
+      },
+      {
+        "$oid": "6720e25f1abc5a888b692607"
+      }
+    ],
+    "lastMessageId": {
+      "$oid": "6720e25f1abc5a888b692607"
+    }
+  },
+
+  {
+    "_id": {
+      "$oid": "670d0cf0af48b35cc7d21e7a"
+    },
+    "chatPartner1": {
+      "$oid": "66f1675f6965d3bd910943d8"
+    },
+    "chatPartner2": {
+      "$oid": "67021a5890f8b6ed17771bd5"
+    },
+    "productID": {
+      "$oid": "66f6b6c50943865aedd01cf5"
+    },
+    "messages": [
+      {
+        "$oid": "670d0b56af48b35cc7d21e6e"
+      },
+      {
+        "$oid": "670d0b56af48b35cc7d21e6f"
+      },
+      {
+        "$oid": "670d0b56af48b35cc7d21e70"
+      },
+      {
+        "$oid": "670d0b56af48b35cc7d21e71"
+      },
+      {
+        "$oid": "67131dafbb23849b1bc7ce3f"
+      },
+      {
+        "$oid": "67131df2bb23849b1bc7ce40"
+      },
+      {
+        "$oid": "6720ba99ed707aecf2572e33"
+      },
+      {
+        "$oid": "6720be6ee6377aba160f64a4"
+      },
+      {
+        "$oid": "6720beb1e6377aba160f64a5"
+      },
+      {
+        "$oid": "6720dba01abc5a888b692605"
+      },
+      {
+        "$oid": "6720dbcf1abc5a888b692606"
+      },
+      {
+        "$oid": "6724f7a62a13c73482e30d72"
+      },
+      {
+        "$oid": "67257ae8c22fe0542d125a28"
+      },
+      {
+        "$oid": "672c0d190f27b8cdcc2dffc5"
+      }
+    ],
+    "lastMessageId": {
+      "$oid": "672c0d190f27b8cdcc2dffc5"
+    }
+  }
+]
