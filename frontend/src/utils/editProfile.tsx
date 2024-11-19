@@ -168,7 +168,7 @@ const EditProfile = () => {
                   setImageToCrop(URL.createObjectURL(e.target.files[0]));
                   setShowImageCropperInterface(true);
                 } else {
-                  console.log("Invalid file provided");
+                  // console.log("Invalid file provided");
                 }
               }}
             />

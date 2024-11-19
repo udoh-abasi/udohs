@@ -12,8 +12,8 @@ import Loader from "../utils/loader";
 import { theMessageInterface } from "../utils/tsInterface";
 import { useSelector } from "react-redux";
 import { userSelector } from "../reduxFiles/selectors";
-import { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { io, Socket } from "socket.io-client";
 
 // NOTE: THIS IS THE SAMPLE RESULT THAT WE WILL GET, IF WE DO 'console.log(data)'
 
@@ -78,11 +78,6 @@ import { io } from "socket.io-client";
 // }
 
 const ChatScreen = () => {
-  const socket = io(backendURL, {
-    // Options
-    withCredentials: true,
-  });
-
   // Get the chatID from the URL
   const { chatID } = useParams();
 
@@ -101,6 +96,7 @@ const ChatScreen = () => {
 
   const navigate = useNavigate();
 
+  // Get the currently logged in user
   const theUserSelector = useSelector(userSelector);
   const user = theUserSelector.userData;
 
@@ -133,11 +129,108 @@ const ChatScreen = () => {
     });
   }, [data]);
 
+  // This function optimistically updates the UI with both the message sent, and message received
+  // Since messages are group based on the date they were sent, we want to first check if a message already exist in today's date, so we update the message array, else add the date and the array
+  const optimisticallyAddMessageOnFrontend = useCallback(
+    (
+      todaysDate: string,
+      todaysDateAndTime: string,
+      trimmedMessage: string,
+      senderID?: string,
+      receiverID?: string,
+      productID?: string
+    ) => {
+      const todaysDateMessages = data.groupedMessages[todaysDate]
+        ? // If today's date already exist, then we add old messages using the spread operator, and then add the new message
+          [
+            ...data.groupedMessages[todaysDate], // Add old messages
+            // Add the new message
+            {
+              _id: todaysDateAndTime, // Since no two date and time can be the same, we use it as the temporary ID, until the backend actually assigns a permanent ID
+              senderID: senderID ? senderID : user?.id, // The current user is obviously the sender (if this function is called in the 'AddNewMessage' function), however, if this function is called in 'socket.on("chatFromBackend"', then he will be the receiver
+              receiverID: receiverID ? receiverID : "",
+              productID: productID ? productID : "",
+              message: trimmedMessage,
+              dateAndTime: todaysDateAndTime, // Set the current date and time.
+              readByReceiver: false,
+            },
+          ]
+        : // If today's date DOES NOT exist, we add the new message as the only message for this date
+          [
+            {
+              _id: todaysDateAndTime,
+              senderID: senderID ? senderID : user?.id,
+              receiverID: receiverID ? receiverID : "",
+              productID: productID ? productID : "",
+              message: trimmedMessage,
+              dateAndTime: todaysDateAndTime,
+              readByReceiver: false,
+            },
+          ];
+
+      // Create the new data
+      const newData = {
+        ...data, // Add the old data
+
+        // Update just the groupMessages object, which is a key-value pair (i.e date: [message, message])
+        groupedMessages: {
+          ...data.groupedMessages, // Add old messages with their date
+          [todaysDate]: todaysDateMessages, // Add the current date with the messages
+        },
+      };
+
+      // NOTE: This sets the useQuery's data to our new data
+      // So, we update the chat between this two users.
+      queryClient.setQueryData(["chatMessage", chatID], newData);
+    },
+    [chatID, data, queryClient, user?.id]
+  );
+
+  // This holds the socket connection
+  const socket = useRef<Socket>();
+
+  // This actually connects the user to socket.io in the backend.
+  // Initially, we did not put the socket connection in useEffect. This caused a re-connection anytime the page re-renders.
+  useEffect(() => {
+    // Connect to socket.io in the backend. This will be done just once
+    socket.current = io(backendURL, {
+      // Options
+      withCredentials: true, // Send the cookie as well
+    });
+
+    // Listen to when there is a chat message from the backend
+    socket.current?.on("chatFromBackend", (msg) => {
+      // First, we immediately add the message to the frontend UI
+      optimisticallyAddMessageOnFrontend(
+        msg.dateAndTime.split("T")[0],
+        msg.dateAndTime,
+        msg.message,
+        msg.senderID,
+        msg.receiverID,
+        msg.productID
+      );
+
+      // Then we update the chat list for the receiver
+      // So, here, we call the 'updateContactData' which is a function in the child component
+      // This will take the chatID, and move the chat with that ID to the top of the contacts
+      if (childRef.current && chatID) {
+        childRef.current.updateContactData(
+          chatID,
+          msg.message,
+          msg.dateAndTime,
+          true
+        );
+      }
+    });
+  }, [chatID, optimisticallyAddMessageOnFrontend]);
+
+  // If there was an error getting data, navigate the user to the home page
   if (isError) {
     navigate("/");
     return <></>;
   }
 
+  // This function takes a date string (e.g "2024-08-25T10:023:39.171Z") and return just it hour and minute
   const getHourAndMinute = (dateString: string) => {
     // Create a new Date object from the input string
     const date = new Date(dateString);
@@ -149,85 +242,6 @@ const ChatScreen = () => {
     // Return the formatted time
     return `${hours}:${minutes}`;
   };
-
-  // This function optimistically updates the UI with both the message sent, and message received
-  // Since messages are group based on the date they were sent, we want to first check if a message already exist in today's date, so we update the message array, else add the date and the array
-  const optimisticallyAddMessageOnFrontend = (
-    todaysDate: string,
-    todaysDateAndTime: string,
-    trimmedMessage: string,
-    senderID?: string,
-    receiverID?: string,
-    productID?: string
-  ) => {
-    const todaysDateMessages = data.groupedMessages[todaysDate]
-      ? // If today's date already exist, then we add old messages using the spread operator, and then add the new message
-        [
-          ...data.groupedMessages[todaysDate], // Add old messages
-          // Add the new message
-          {
-            _id: todaysDateAndTime, // Since no two date and time can be the same, we use it as the temporary ID, until the backend actually assigns a permanent ID
-            senderID: senderID ? senderID : user?.id, // The current user is obviously the sender (if this function is called in the 'AddNewMessage' function), however, if this function is called in 'socket.on("chatFromBackend"', then he will be the receiver
-            receiverID: receiverID ? receiverID : "",
-            productID: productID ? productID : "",
-            message: trimmedMessage,
-            dateAndTime: todaysDateAndTime, // Set the current date and time.
-            readByReceiver: false,
-          },
-        ]
-      : // If today's date DOES NOT exist, we add the new message as the only message for this date
-        [
-          {
-            _id: todaysDateAndTime,
-            senderID: senderID ? senderID : user?.id,
-            receiverID: receiverID ? receiverID : "",
-            productID: productID ? productID : "",
-            message: trimmedMessage,
-            dateAndTime: todaysDateAndTime,
-            readByReceiver: false,
-          },
-        ];
-
-    // Create the new data
-    const newData = {
-      ...data, // Add the old data
-
-      // Update just the groupMessages object, which is a key-value pair (i.e date: [message, message])
-      groupedMessages: {
-        ...data.groupedMessages, // Add old messages with their date
-        [todaysDate]: todaysDateMessages, // Add the current date with the messages
-      },
-    };
-
-    // NOTE: This sets the useQuery's data to our new data
-    // So, we update the chat between this two users.
-    queryClient.setQueryData(["chatMessage", chatID], newData);
-  };
-
-  socket.on("chatFromBackend", (msg) => {
-    console.log(msg);
-
-    optimisticallyAddMessageOnFrontend(
-      msg.dateAndTime.split("T")[0],
-      msg.dateAndTime,
-      msg.message,
-      msg.senderID,
-      msg.receiverID,
-      msg.productID
-    );
-
-    // Update the chat list for the receiver
-    // So, here, we call the 'updateContactData' which is a function in the child component
-    // This will take the chatID, and move the chat with that ID to the top of the contacts
-    if (childRef.current && chatID) {
-      childRef.current.updateContactData(
-        chatID,
-        msg.message,
-        msg.dateAndTime,
-        true
-      );
-    }
-  });
 
   // When a user sends a new message. This adds the message to the message list, and also moves the chat with that contact up
   const AddNewMessage = async () => {
@@ -257,7 +271,7 @@ const ChatScreen = () => {
       );
 
       // Send the message to the backend, to store in the database, update the lastMessageID and then send the message to the other chatPartner
-      socket.emit("chatFromFrontend", {
+      socket.current?.emit("chatFromFrontend", {
         trimmedMessage,
         to: data.otherPartnerID,
         productID: data.productID,

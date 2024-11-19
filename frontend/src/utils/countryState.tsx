@@ -54,7 +54,6 @@ const CountryAndState: React.FC<CountryAndStateProps> = ({
         onSetIsLoading(false);
       } else {
         onSetIsLoading(false);
-        console.log("There was an error");
       }
     } catch (error) {
       onSetIsLoading(false);

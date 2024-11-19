@@ -172,14 +172,10 @@ const connectedUsers: connectedUsersInterface = {};
 
 // Handle socket connections
 io.on("connection", (socket: AuthenticatedSocket) => {
-  // console.log(`User ${socket.user?.email} connected`);
-
   // Add the user's ID and the ID of the socket the user connected to, to the array of connected users
   if (socket.user?._id) {
     connectedUsers[socket.user?._id.toString()] = socket.id;
   }
-
-  // console.log("connectedUsers", connectedUsers);
 
   // Check if user is already connected from another device
   if (socket.user?._id) {
@@ -194,8 +190,6 @@ io.on("connection", (socket: AuthenticatedSocket) => {
 
   // Handle when we get a message from the frontend
   socket.on("chatFromFrontend", async (msg) => {
-    console.log("Message from frontend", msg, socket.user?._id);
-
     // Put the message in the database, and send to user (if they are online)
     if (socket.user?._id) {
       try {
@@ -237,10 +231,8 @@ io.on("connection", (socket: AuthenticatedSocket) => {
 
   // Handle socket disconnection
   socket.on("disconnect", () => {
-    console.log(`${socket.user?.email} DISCONNECTED`);
     if (socket.user?._id) {
       delete connectedUsers[socket.user?._id?.toString()];
-      // console.log("connectedUsers", connectedUsers);
     }
   });
 });
