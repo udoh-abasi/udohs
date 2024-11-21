@@ -101,6 +101,10 @@ app.use("/api", [
   startChatRoute,
 ]);
 
+app.get("/home", (req, res) => {
+  res.status(200).json("Welcome, your app is working well");
+});
+
 // NOTE: Because we are using socket.io, this is how we are expected to create our server
 const httpServer = createServer(app);
 
