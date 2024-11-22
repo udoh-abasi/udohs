@@ -33,6 +33,7 @@ import { createServer } from "http";
 import { UserCollection } from "./utils/tsInterface";
 import passport from "passport";
 import { AddNewChat, socketUtils } from "./utils/socket";
+import MongoDBStore from "connect-mongodb-session";
 
 config(); // Load .env file
 
@@ -52,12 +53,26 @@ app.use(express.json()); // Enables getting data from 'req.body'
 export const imageDirectory = path.join(__dirname, "public"); // NOTE: This is the directory where we want to store image files. So, '__dirname' will give us the directory where this file is located in
 app.use("/image", express.static(imageDirectory)); // NOTE: The '/image' means we will have access to the 'imageDirectory' by visiting /image. E.g, we can access a file called 'myPhoto.jpg' in the 'profileImage' folder by visiting 'http://localhost:8000/image/profileImages/myPhoto.jpg'
 
+// MongoDB session store
+const MongoStore = MongoDBStore(session);
+
+const store = new MongoStore({
+  uri: process.env.MONGODB_URI as string,
+  collection: "sessions", // Name of the collection for session storage
+});
+
+// Handle errors with the session store
+store.on("error", (error: Error) => {
+  console.error("Session store error:", error);
+});
+
 // Initialize session management with cookie-session. This is compulsory, even if you are NOT using sessions
 app.use(
   session({
     secret: process.env.SESSION_SECRET as string,
     name: "sessionID",
     resave: false,
+    store,
     saveUninitialized: true,
     cookie: { secure: true },
   })
