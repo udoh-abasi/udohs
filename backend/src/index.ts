@@ -271,3 +271,5 @@ connectToMongo()
   .catch((e) => {
     console.log("The error", e);
   });
+
+export default app;
