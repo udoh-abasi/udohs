@@ -10,7 +10,7 @@ const sendGoogleLink = (req: Request, res: Response) => {
       new URLSearchParams({
         response_type: "code",
         client_id: process.env.GOOGLE_CLIENT_ID as string, // NOTE: This must be a string, else TS will raise as error
-        redirect_uri: "udohs.vercel.app",
+        redirect_uri: frontendURL,
         scope: "openid email profile",
       });
 

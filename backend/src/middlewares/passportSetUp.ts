@@ -100,7 +100,7 @@ const passportSetUp = () => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID as string,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-        callbackURL: "udohs.vercel.app", // NOTE: This is same as the 'Authorization callback URL' we provided on the google site when setting up the app
+        callbackURL: frontendURL, // NOTE: This is same as the 'Authorization callback URL' we provided on the google site when setting up the app
         passReqToCallback: true,
       },
       async (req, accessToken, refreshToken, profile, done) => {
