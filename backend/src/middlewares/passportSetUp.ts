@@ -100,7 +100,8 @@ const passportSetUp = () => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID as string,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-        callbackURL: frontendURL, // NOTE: This is same as the 'Authorization callback URL' we provided on the GitHub site when setting up the app
+        callbackURL: frontendURL, // NOTE: This is same as the 'Authorization callback URL' we provided on the google site when setting up the app
+        authorizationURL: frontendURL,
         passReqToCallback: true,
       },
       async (req, accessToken, refreshToken, profile, done) => {
