@@ -40,7 +40,7 @@ config(); // Load .env file
 const app = express();
 
 const corsOptions = {
-  origin: ["http://localhost:5173", "*"],
+  origin: ["https://udohs.vercel.app"],
   credentials: true,
   optionsSuccessStatus: 200, // NOTE: This is for some legacy browsers (IE11, various SmartTVs) that choke on 204
 };
@@ -56,6 +56,7 @@ app.use("/image", express.static(imageDirectory)); // NOTE: The '/image' means w
 // MongoDB session store
 const MongoStore = MongoDBStore(session);
 
+// Store is added, even if we are NOT using sessions, because vercel will NOT let us host without adding a store
 const store = new MongoStore({
   uri: process.env.MONGODB_URI as string,
   collection: "sessions", // Name of the collection for session storage
@@ -272,4 +273,5 @@ connectToMongo()
     console.log("The error", e);
   });
 
+// We have to export this, if not, there will be an error when we deploy to vercel
 export default app;

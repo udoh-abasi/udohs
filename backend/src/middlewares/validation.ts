@@ -7,7 +7,7 @@ export const validateEmail = body("email")
   .isEmail()
   .normalizeEmail({
     gmail_remove_dots: false, // By default, any dot in an email will be removed. This prevents that
-    gmail_remove_subaddress: false, // This was added so that in emails like 'udoh+test@gmail.com', the '+test' will be preserved. If not it will be removed
+    gmail_remove_subaddress: true, // This was added so that in emails like 'udoh+test@gmail.com', the '+test' will be preserved. If not it will be removed
   })
   .withMessage("Please enter a valid email address.");
 
