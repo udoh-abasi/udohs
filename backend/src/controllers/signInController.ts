@@ -29,7 +29,7 @@ export const signInUserFunction = async (
     res.cookie("token", encryptedToken, {
       httpOnly: true, // Makes the token only accessible by the server (backend)
       secure: true, // Ensure the cookie is used via HTTPS only
-      sameSite: "strict", // Changed from 'strict' to 'none' to allow cross-origin. Since frontend is hosted on 'https://udohs.vercel.app' and backend is hosted on 'https://udohs-backend.vercel.app', if we do not set "none", cookies will NOT be sent to the backend from the browser
+      sameSite: "none", // Changed from 'strict' to 'none' to allow cross-origin. Since frontend is hosted on 'https://udohs.vercel.app' and backend is hosted on 'https://udohs-backend.vercel.app', if we do not set "none", cookies will NOT be sent to the backend from the browser
       // domain: "vercel.app", // Optional: set domain to share between subdomains
       // maxAge: 72 * 60 * 60 * 1000, // 72 hours in milliseconds
     });
