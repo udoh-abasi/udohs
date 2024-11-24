@@ -13,7 +13,7 @@ router.post("/logout", async (req, res) => {
       res.clearCookie("token", {
         httpOnly: true,
         secure: true,
-        sameSite: true,
+        // sameSite: true,
       });
 
       return res.sendStatus(200);
