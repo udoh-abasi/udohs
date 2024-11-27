@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // NOTE: This is used in the 'countryState.tsx' to send a fetch request to the backend
-export const backendURL = "https://udohs-backend.vercel.app";
+export const backendURL = "https://udohsbackend.udohabasi.com";
+// export const backendURL = "https://udohs-backend.vercel.app";
 
 // The URL where the profile images can be gotten from
 export const profilePictureURL = `${backendURL}/image/profileImages`;

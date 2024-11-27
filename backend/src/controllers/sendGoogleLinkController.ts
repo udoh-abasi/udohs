@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-export const frontendURL = "https://udohs.vercel.app";
+export const frontendURL = "https://udohs.udohabasi.com";
 
 const sendGoogleLink = (req: Request, res: Response) => {
   try {

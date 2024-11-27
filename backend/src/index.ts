@@ -40,7 +40,7 @@ config(); // Load .env file
 const app = express();
 
 const corsOptions = {
-  origin: ["https://udohs.vercel.app"],
+  origin: ["https://udohs.udohabasi.com"],
   credentials: true,
   optionsSuccessStatus: 200, // NOTE: This is for some legacy browsers (IE11, various SmartTVs) that choke on 204
 };
