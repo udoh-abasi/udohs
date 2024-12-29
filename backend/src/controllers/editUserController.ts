@@ -39,7 +39,18 @@ const EditUser = async (req: Request, res: Response) => {
 
     // If the user wants to edit their profile pic
     if (profilePic && phoneNumber && fullName) {
-      const resizedImagePath = `./temp/resized-${profilePic.originalname}`;
+      // Ensure the directory exists
+      const tempDir = path.resolve("./temp");
+
+      if (!fs.existsSync(tempDir)) {
+        console.log("Folder was not available but now to be created");
+        fs.mkdirSync(tempDir, { recursive: true });
+      }
+
+      const resizedImagePath = path.join(
+        tempDir,
+        `resized-${profilePic.originalname}`
+      );
 
       // Get the directory where profile pic are stored. On development, if you console.log this 'profilePicDirectory', you will see 'C:\Users\dell\Desktop\udohs\backend/src/public/profileImages'
       const profilePicDirectory = path.join(imageDirectory, "profileImages/"); // NOTE: 'imageDirectory' is defined in 'index.ts' file, and it points to the folder where we have images. We just joined it with 'profileImages', to get the profile image folder
@@ -81,6 +92,8 @@ const EditUser = async (req: Request, res: Response) => {
           "message" in e &&
           typeof e.message === "string"
         ) {
+          console.log("Entered catch error side to create folder");
+
           // Check if the error message contains the text 'unable to open for write', if true, that means the profile pic directory does not exist
           if (e.message.toLowerCase().includes("unable to open for write")) {
             try {
@@ -152,6 +165,9 @@ const EditUser = async (req: Request, res: Response) => {
         if (oldProfilePicture) {
           // deleteOldProfilePic(`${profilePicDirectory}/${oldProfilePicture}`);
         }
+
+        // Optionally, delete the temporary resized file
+        // fs.unlinkSync(resizedImagePath);
 
         // If we got a user, return the user, with a 200 status code, else return an error.
         if (user) {
