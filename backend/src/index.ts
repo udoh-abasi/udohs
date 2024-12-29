@@ -34,6 +34,7 @@ import { UserCollection } from "./utils/tsInterface";
 import passport from "passport";
 import { AddNewChat, socketUtils } from "./utils/socket";
 import MongoDBStore from "connect-mongodb-session";
+import { v2 as cloudinary } from "cloudinary";
 
 config(); // Load .env file
 
@@ -52,6 +53,16 @@ app.use(express.json()); // Enables getting data from 'req.body'
 // Set up static file serving. On development, if you console.log this 'imageDirectory', you will see 'C:\Users\dell\Desktop\udohs\backend/src/public
 export const imageDirectory = path.join(__dirname, "public"); // NOTE: This is the directory where we want to store image files. So, '__dirname' will give us the directory where this file is located in
 app.use("/image", express.static(imageDirectory)); // NOTE: The '/image' means we will have access to the 'imageDirectory' by visiting /image. E.g, we can access a file called 'myPhoto.jpg' in the 'profileImage' folder by visiting 'http://localhost:8000/image/profileImages/myPhoto.jpg'
+
+// NOTE: In production, nodejs does not serve static files. So, we used a hosting platform 'cloudinary' for this purpose
+// This is the configuration
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME as string,
+  api_key: process.env.CLOUDINARY_API_KEY as string,
+  api_secret: process.env.CLOUDINARY_API_SECRET as string,
+  secure: true, // Return "https" URLs by setting secure: true
+});
 
 // MongoDB session store
 const MongoStore = MongoDBStore(session);

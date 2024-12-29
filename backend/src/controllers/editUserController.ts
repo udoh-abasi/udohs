@@ -5,6 +5,7 @@ import path from "path";
 import sharp from "sharp";
 import fs from "fs";
 import { imageDirectory } from "../index";
+import { v2 as cloudinary } from "cloudinary";
 
 // This function deletes the old profile picture (if it exist), when a user uploads a new one
 const deleteOldProfilePic = (thePicPath: string) => {
@@ -13,6 +14,14 @@ const deleteOldProfilePic = (thePicPath: string) => {
       // Do nothing, because I don't want this to affect the outcome to the client
     }
   });
+};
+
+const uploadToCloudinary = async (filePath: string, folderName: string) => {
+  const result = await cloudinary.uploader.upload(filePath, {
+    folder: folderName, // Optional: Organize files into a folder
+  });
+
+  return result.secure_url; // URL of the uploaded image
 };
 
 const EditUser = async (req: Request, res: Response) => {
@@ -30,11 +39,15 @@ const EditUser = async (req: Request, res: Response) => {
 
     // If the user wants to edit their profile pic
     if (profilePic && phoneNumber && fullName) {
+      const resizedImagePath = `./temp/resized-${profilePic.originalname}`;
+
       // Get the directory where profile pic are stored. On development, if you console.log this 'profilePicDirectory', you will see 'C:\Users\dell\Desktop\udohs\backend/src/public/profileImages'
       const profilePicDirectory = path.join(imageDirectory, "profileImages/"); // NOTE: 'imageDirectory' is defined in 'index.ts' file, and it points to the folder where we have images. We just joined it with 'profileImages', to get the profile image folder
 
       // This holds the cropped image by sharp
       let theCroppedImage: sharp.OutputInfo;
+
+      let theResult = "";
 
       try {
         // Try to save the image into the profile pic directory
@@ -45,7 +58,20 @@ const EditUser = async (req: Request, res: Response) => {
             background: { r: 255, g: 255, b: 255, alpha: 1 }, // Specify the background color to be used to fill the extra padding that sharp will add. This is just RGBA values, so we want white here
             withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 300px, if either the width or height is less than 300px
           })
-          .toFile(`${profilePicDirectory}/${profilePic?.originalname}`); // NOTE: We used the original name sent by the frontend here
+          .toFile(resizedImagePath); // NOTE: We used the original name sent by the frontend here
+
+        // Upload to cloudinary
+        theResult = await uploadToCloudinary(resizedImagePath, "profilePic");
+
+        // // Try to save the image into the profile pic directory
+        // theCroppedImage = await sharp(profilePic?.buffer)
+        //   .resize(300, 300, {
+        //     fit: "contain", // This means, the image will be shrunk (without cutting out any part), to fit the specified dimensions (300x300) if the image's width or height is larger than 300. If after shrinking, and let's say, the image is now 300x200, sharp will add extra padding (at the top and bottom, OR left and right as required), to ensure the image is 300x300
+        //     position: "center", // A position strategy to use. Other options are top, right top, right, right bottom, bottom etc
+        //     background: { r: 255, g: 255, b: 255, alpha: 1 }, // Specify the background color to be used to fill the extra padding that sharp will add. This is just RGBA values, so we want white here
+        //     withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 300px, if either the width or height is less than 300px
+        //   })
+        //   .toFile(`${profilePicDirectory}/${profilePic?.originalname}`); // NOTE: We used the original name sent by the frontend here
       } catch (e) {
         // NOTE: An error will occur if the profile pic directory does not exist, as sharp does not create directories for us, if they DO NOT exist
         if (
@@ -95,7 +121,8 @@ const EditUser = async (req: Request, res: Response) => {
             $set: {
               fullName,
               phoneNumber,
-              profilePicture: `${profilePic?.originalname}`,
+              // profilePicture: `${profilePic?.originalname}`,
+              profilePicture: theResult,
             },
           },
           { upsert: false, returnDocument: "before" } // Ensure no new document is created if the required document does not exist, and the returned document will be BEFORE the update is made
@@ -107,7 +134,7 @@ const EditUser = async (req: Request, res: Response) => {
 
         // Delete older profile picture from the profile pic directory, to ensure junk (unused) files don't fill the directory
         if (oldProfilePicture) {
-          deleteOldProfilePic(`${profilePicDirectory}/${oldProfilePicture}`);
+          // deleteOldProfilePic(`${profilePicDirectory}/${oldProfilePicture}`);
         }
 
         // If we got a user, return the user, with a 200 status code, else return an error.
@@ -117,7 +144,8 @@ const EditUser = async (req: Request, res: Response) => {
             email: user?.email,
             phoneNumber, // NOTE: We returned the phone number sent by the frontend, instead of the one returned by mongodb (so, we did NOT do 'user?.phoneNumber')
             fullName, // NOTE: We returned the full name sent by the frontend, instead of the one returned by mongodb (so, we did NOT do 'user?.fullName')
-            profilePicture: `${profilePic?.originalname}`, // NOTE: We returned the profile pic sent by the frontend, instead of the one returned by mongodb (so, we did NOT do 'user?.profilePicture')
+            profilePicture: theResult, // NOTE: We returned the profile pic sent by the frontend, instead of the one returned by mongodb (so, we did NOT do 'user?.profilePicture')
+            // profilePicture: `${profilePic?.originalname}`, // NOTE: We returned the profile pic sent by the frontend, instead of the one returned by mongodb (so, we did NOT do 'user?.profilePicture')
             dateJoined: user?.dateJoined,
           });
         } else {
