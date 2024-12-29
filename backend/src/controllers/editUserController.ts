@@ -40,7 +40,7 @@ const EditUser = async (req: Request, res: Response) => {
     // If the user wants to edit their profile pic
     if (profilePic && phoneNumber && fullName) {
       // Ensure the directory exists
-      const tempDir = path.resolve("./temp");
+      const tempDir = "/tmp";
 
       if (!fs.existsSync(tempDir)) {
         console.log("Folder was not available but now to be created");
@@ -51,6 +51,8 @@ const EditUser = async (req: Request, res: Response) => {
         tempDir,
         `resized-${profilePic.originalname}`
       );
+
+      console.log("Folder was created");
 
       // Get the directory where profile pic are stored. On development, if you console.log this 'profilePicDirectory', you will see 'C:\Users\dell\Desktop\udohs\backend/src/public/profileImages'
       const profilePicDirectory = path.join(imageDirectory, "profileImages/"); // NOTE: 'imageDirectory' is defined in 'index.ts' file, and it points to the folder where we have images. We just joined it with 'profileImages', to get the profile image folder
@@ -102,7 +104,7 @@ const EditUser = async (req: Request, res: Response) => {
 
               // If directory does not exist, then create it
               if (!folderAlreadyExist) {
-                fs.mkdirSync(profilePicDirectory, { recursive: true }); // NOTE: Setting 'recursive' to true is necessary, if not there will be errors, because, currently, we have the src folder, and we are trying to create two new folders (i.e, public and profileImages), so, we have to do that recursively
+                // fs.mkdirSync(profilePicDirectory, { recursive: true }); // NOTE: Setting 'recursive' to true is necessary, if not there will be errors, because, currently, we have the src folder, and we are trying to create two new folders (i.e, public and profileImages), so, we have to do that recursively
               }
 
               // Then we try to save the image into the profile pic directory again
