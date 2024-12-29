@@ -93,6 +93,16 @@ const EditUser = async (req: Request, res: Response) => {
               }
 
               // Then we try to save the image into the profile pic directory again
+              // theCroppedImage = await sharp(profilePic?.buffer)
+              //   .resize(300, 300, {
+              //     fit: "contain", // This means, the image will be shrunk (without cutting out any part), to fit the specified dimensions (300x300) if the image's width or height is larger than 300. If after shrinking, and let's say, the image is now 300x200, sharp will add extra padding (at the top and bottom, OR left and right as required), to ensure the image is 300x300
+              //     position: "center", // A position strategy to use. Other options are top, right top, right, right bottom, bottom etc
+              //     background: { r: 255, g: 255, b: 255, alpha: 1 }, // Specify the background color to be used to fill the extra padding that sharp will add. This is just RGBA values, so we want white here
+              //     withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 300px, if either the width or height is less than 300px
+              //   })
+              //   .toFile(`${profilePicDirectory}/${profilePic?.originalname}`); // NOTE: We used the original name sent by the frontend here
+
+              // Try to save the image into the profile pic directory
               theCroppedImage = await sharp(profilePic?.buffer)
                 .resize(300, 300, {
                   fit: "contain", // This means, the image will be shrunk (without cutting out any part), to fit the specified dimensions (300x300) if the image's width or height is larger than 300. If after shrinking, and let's say, the image is now 300x200, sharp will add extra padding (at the top and bottom, OR left and right as required), to ensure the image is 300x300
@@ -100,7 +110,13 @@ const EditUser = async (req: Request, res: Response) => {
                   background: { r: 255, g: 255, b: 255, alpha: 1 }, // Specify the background color to be used to fill the extra padding that sharp will add. This is just RGBA values, so we want white here
                   withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 300px, if either the width or height is less than 300px
                 })
-                .toFile(`${profilePicDirectory}/${profilePic?.originalname}`); // NOTE: We used the original name sent by the frontend here
+                .toFile(resizedImagePath); // NOTE: We used the original name sent by the frontend here
+
+              // Upload to cloudinary
+              theResult = await uploadToCloudinary(
+                resizedImagePath,
+                "profilePic"
+              );
             } catch (e) {
               console.log(e);
               return res.sendStatus(400);
