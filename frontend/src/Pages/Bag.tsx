@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import Loader from "../utils/loader";
 import { useCallback } from "react";
-import axiosClient, { productImagesURL } from "../utils/axiosSetup";
+import axiosClient from "../utils/axiosSetup";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Product } from "../utils/tsInterface";
 
@@ -70,7 +70,7 @@ const Bag = () => {
                         <div>
                           <img
                             alt=""
-                            src={`${productImagesURL}/${heroPhoto}`}
+                            src={`${heroPhoto}`}
                             className=" rounded-2xl"
                           />
                         </div>

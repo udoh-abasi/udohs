@@ -7,8 +7,8 @@ import fs from "fs";
 import { imageDirectory } from "../index";
 import { v2 as cloudinary } from "cloudinary";
 
-// This function deletes the old profile picture (if it exist), when a user uploads a new one
-const deleteOldProfilePic = (thePicPath: string) => {
+// This function deletes the temporary image, after it has been sent to cloudinary
+export const deleteTempImageFile = (thePicPath: string) => {
   fs.unlink(thePicPath, (err) => {
     if (err) {
       // Do nothing, because I don't want this to affect the outcome to the client
@@ -16,12 +16,21 @@ const deleteOldProfilePic = (thePicPath: string) => {
   });
 };
 
-const uploadToCloudinary = async (filePath: string, folderName: string) => {
+// IN PRODUCTION - This function uploads the image to cloudinary.
+// 'filepath' is the full path to the image we want to upload.
+// 'folderName' is the name of the folder in cloudinary that we want to upload the image to.
+export const uploadToCloudinary = async (
+  filePath: string,
+  folderName: string
+) => {
   const result = await cloudinary.uploader.upload(filePath, {
     folder: folderName, // Optional: Organize files into a folder
+    use_filename: true, // Use the uploaded image's original name as the image's public ID on cloudinary
+    unique_filename: true,
+    overwrite: true, // allow overwriting the image with new versions, if they're the same name
   });
 
-  return result.secure_url; // URL of the uploaded image
+  return result.secure_url; // URL of the uploaded image. This is usually in the format 'https://res.cloudinary.com/drqepxmnc/image/upload/v1735485662/profilePic/gw1s4jg7pu686olcgvgc.jpg'
 };
 
 const EditUser = async (req: Request, res: Response) => {
@@ -39,28 +48,26 @@ const EditUser = async (req: Request, res: Response) => {
 
     // If the user wants to edit their profile pic
     if (profilePic && phoneNumber && fullName) {
-      // Ensure the directory exists
+      // NOTE: In production, when you host on 'vercel', we have a temporary folder called 'tmp', where we can store temporary files.
+      // If you try creating any other folder, you will get errors
       const tempDir = "/tmp";
 
+      // Ensure the directory exists
       if (!fs.existsSync(tempDir)) {
-        console.log("Folder was not available but now to be created");
-        fs.mkdirSync(tempDir, { recursive: true });
+        fs.mkdirSync(tempDir, { recursive: true }); // Create the temporary directory
       }
 
+      // After resizing the image with sharp, we will temporarily store it in this path
       const resizedImagePath = path.join(
         tempDir,
         `resized-${profilePic.originalname}`
       );
 
-      console.log("Folder was created");
-
-      // Get the directory where profile pic are stored. On development, if you console.log this 'profilePicDirectory', you will see 'C:\Users\dell\Desktop\udohs\backend/src/public/profileImages'
+      // FOR DEVELOPMENT - Get the directory where profile pic are stored. On development, if you console.log this 'profilePicDirectory', you will see 'C:\Users\dell\Desktop\udohs\backend/src/public/profileImages'
       const profilePicDirectory = path.join(imageDirectory, "profileImages/"); // NOTE: 'imageDirectory' is defined in 'index.ts' file, and it points to the folder where we have images. We just joined it with 'profileImages', to get the profile image folder
 
       // This holds the cropped image by sharp
       let theCroppedImage: sharp.OutputInfo;
-
-      let theResult = "";
 
       try {
         // Try to save the image into the profile pic directory
@@ -71,12 +78,9 @@ const EditUser = async (req: Request, res: Response) => {
             background: { r: 255, g: 255, b: 255, alpha: 1 }, // Specify the background color to be used to fill the extra padding that sharp will add. This is just RGBA values, so we want white here
             withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 300px, if either the width or height is less than 300px
           })
-          .toFile(resizedImagePath); // NOTE: We used the original name sent by the frontend here
+          .toFile(resizedImagePath);
 
-        // Upload to cloudinary
-        theResult = await uploadToCloudinary(resizedImagePath, "profilePic");
-
-        // // Try to save the image into the profile pic directory
+        // FOR DEVELOPMENT - Try to save the image into the profile pic directory
         // theCroppedImage = await sharp(profilePic?.buffer)
         //   .resize(300, 300, {
         //     fit: "contain", // This means, the image will be shrunk (without cutting out any part), to fit the specified dimensions (300x300) if the image's width or height is larger than 300. If after shrinking, and let's say, the image is now 300x200, sharp will add extra padding (at the top and bottom, OR left and right as required), to ensure the image is 300x300
@@ -94,8 +98,6 @@ const EditUser = async (req: Request, res: Response) => {
           "message" in e &&
           typeof e.message === "string"
         ) {
-          console.log("Entered catch error side to create folder");
-
           // Check if the error message contains the text 'unable to open for write', if true, that means the profile pic directory does not exist
           if (e.message.toLowerCase().includes("unable to open for write")) {
             try {
@@ -126,12 +128,6 @@ const EditUser = async (req: Request, res: Response) => {
                   withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 300px, if either the width or height is less than 300px
                 })
                 .toFile(resizedImagePath); // NOTE: We used the original name sent by the frontend here
-
-              // Upload to cloudinary
-              theResult = await uploadToCloudinary(
-                resizedImagePath,
-                "profilePic"
-              );
             } catch (e) {
               console.log(e);
               return res.sendStatus(400);
@@ -145,6 +141,15 @@ const EditUser = async (req: Request, res: Response) => {
       }
 
       if (theCroppedImage.width === 300 && theCroppedImage.height === 300) {
+        // Upload the image to cloudinary. This returns the image link
+        const theResult = await uploadToCloudinary(
+          resizedImagePath,
+          "profilePic"
+        );
+
+        // Delete the temporary picture
+        deleteTempImageFile(resizedImagePath);
+
         // Get the logged in user, and change their name and phone number and profile pic. This ensures another user does not change another user's details
         const user = await usersCollection.findOneAndUpdate(
           { email: req.user?.email },
@@ -163,13 +168,10 @@ const EditUser = async (req: Request, res: Response) => {
         // This ensures ONLY one request is sent during in operation
         const oldProfilePicture = user?.profilePicture;
 
-        // Delete older profile picture from the profile pic directory, to ensure junk (unused) files don't fill the directory
+        // IN DEVELOPMENT - Delete older profile picture from the profile pic directory, to ensure junk (unused) files don't fill the directory
         if (oldProfilePicture) {
           // deleteOldProfilePic(`${profilePicDirectory}/${oldProfilePicture}`);
         }
-
-        // Optionally, delete the temporary resized file
-        // fs.unlinkSync(resizedImagePath);
 
         // If we got a user, return the user, with a 200 status code, else return an error.
         if (user) {
@@ -189,7 +191,7 @@ const EditUser = async (req: Request, res: Response) => {
         return res.sendStatus(400);
       }
 
-      // If the user is not updating their profile pic
+      // If the user is NOT updating their profile pic
     } else if (phoneNumber && fullName) {
       // Get the logged in user, and change their name and phone number. This ensures another user does not change another user's details
       const user = await usersCollection.findOneAndUpdate(

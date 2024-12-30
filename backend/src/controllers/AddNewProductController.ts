@@ -5,6 +5,7 @@ import path from "path";
 import { imageDirectory } from "..";
 import sharp from "sharp";
 import fs from "fs";
+import { deleteTempImageFile, uploadToCloudinary } from "./editUserController";
 
 const AddProduct = async (req: Request, res: Response) => {
   try {
@@ -37,12 +38,21 @@ const AddProduct = async (req: Request, res: Response) => {
       const productsCollection =
         udohsDatabase.collection<ProductCollection>("products");
 
-      // Get the directory where product Photos are stored. On development, if you console.log this 'productPhotosDirectory', you will see 'C:\Users\dell\Desktop\udohs\backend/src/public/productPhotos'
+      // IN DEVELOPMENT - Get the directory where product Photos are stored. On development, if you console.log this 'productPhotosDirectory', you will see 'C:\Users\dell\Desktop\udohs\backend/src/public/productPhotos'
       // NOTE: 'imageDirectory' is defined in 'index.ts' file, and it points to the folder where we have all images (i.e 'C:\Users\dell\Desktop\udohs\backend/src/public'). We just joined it with 'productPhotos', to get the product Photos folder
-      const productPhotosDirectory = path.join(
-        imageDirectory,
-        "productPhotos/"
-      );
+      // const productPhotosDirectory = path.join(
+      //   imageDirectory,
+      //   "productPhotos/"
+      // );
+
+      // NOTE: In production, when you host on 'vercel', we have a temporary folder called 'tmp', where we can store temporary files.
+      // If you try creating any other folder, you will get errors
+      const tempDir = "/tmp";
+
+      // Ensure the directory exists
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true }); // Create the temporary directory
+      }
 
       // So, we check if 'photos' is an array, if not, TS will cause errors
       if (Array.isArray(photos)) {
@@ -56,80 +66,99 @@ const AddProduct = async (req: Request, res: Response) => {
             // This holds the cropped image by sharp
             let theCroppedImage: sharp.OutputInfo;
 
-            try {
-              // Try to save the image into the directory
-              theCroppedImage = await sharp(eachFileBlob?.buffer)
-                .resize(1080, 780, {
-                  fit: "contain", // This means, the image will be shrunk (without cutting out any part), to fit the specified dimensions (1080x700) if the image's width or height is larger than 1080 or 780 respectively. If after shrinking, and let's say, the image is now 1080x600, sharp will add extra padding (at the top and bottom, OR left and right as required), to ensure the image is 1080x780
-                  position: "center", // A position strategy to use. Other options are top, right top, right, right bottom, bottom etc
-                  background: { r: 255, g: 255, b: 255, alpha: 1 }, // Specify the background color to be used to fill the extra padding that sharp will add. This is just RGBA values, so we want white here
-                  withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 1080px or 780px respectively, if either the width or height is less
-                })
-                .toFile(
-                  `${productPhotosDirectory}/${eachFileBlob?.originalname}`
-                ); // NOTE: We used the original name sent by the frontend here
+            // After resizing the image with sharp, we will temporarily store it in this path
+            const resizedImagePath = path.join(
+              tempDir,
+              `resized-${eachFileBlob.originalname}`
+            );
 
-              if (
-                theCroppedImage.width === 1080 &&
-                theCroppedImage.height === 780
-              ) {
-                // Add the image's file name to the array
-                allCroppedImages.push(eachFileBlob.originalname);
-              }
-            } catch (e) {
-              // NOTE: An error will occur if the productPhotos directory does not exist, as sharp does not create directories for us, if they DO NOT exist
-              if (
-                // This is done to prevent typescript errors
-                typeof e === "object" &&
-                e &&
-                "message" in e &&
-                typeof e.message === "string"
-              ) {
-                // Check if the error message contains the text 'unable to open for write', if true, that means the productPhotos directory does not exist
-                if (
-                  e.message.toLowerCase().includes("unable to open for write")
-                ) {
-                  try {
-                    // Check if the directory does NOT exist for real
-                    const folderAlreadyExist = fs.existsSync(
-                      productPhotosDirectory
-                    );
+            // try {
+            // Try to save the image into the directory
+            theCroppedImage = await sharp(eachFileBlob?.buffer)
+              .resize(1080, 780, {
+                fit: "contain", // This means, the image will be shrunk (without cutting out any part), to fit the specified dimensions (1080x700) if the image's width or height is larger than 1080 or 780 respectively. If after shrinking, and let's say, the image is now 1080x600, sharp will add extra padding (at the top and bottom, OR left and right as required), to ensure the image is 1080x780
+                position: "center", // A position strategy to use. Other options are top, right top, right, right bottom, bottom etc
+                background: { r: 255, g: 255, b: 255, alpha: 1 }, // Specify the background color to be used to fill the extra padding that sharp will add. This is just RGBA values, so we want white here
+                withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 1080px or 780px respectively, if either the width or height is less
+              })
+              .toFile(resizedImagePath); // NOTE: We used the original name sent by the frontend here
 
-                    // If directory does not exist, then create it
-                    if (!folderAlreadyExist) {
-                      fs.mkdirSync(productPhotosDirectory, { recursive: true }); // NOTE: Setting 'recursive' to true is necessary, if not there will be errors, because, currently, we have the src folder, and we are trying to create two new folders (i.e, public and productPhotos), so, we have to do that recursively
-                    }
+            if (
+              theCroppedImage.width === 1080 &&
+              theCroppedImage.height === 780
+            ) {
+              // Upload the image to cloudinary. This returns the image link
+              const theResult = await uploadToCloudinary(
+                resizedImagePath,
+                "productPhotos"
+              );
 
-                    // Then we try to save the image into the productPhotos directory again
-                    theCroppedImage = await sharp(eachFileBlob?.buffer)
-                      .resize(1080, 780, {
-                        fit: "contain", // This means, the image will be shrunk (without cutting out any part), to fit the specified dimensions (1080x700) if the image's width or height is larger than 1080 or 780 respectively. If after shrinking, and let's say, the image is now 1080x600, sharp will add extra padding (at the top and bottom, OR left and right as required), to ensure the image is 1080x780
-                        position: "center", // A position strategy to use. Other options are top, right top, right, right bottom, bottom etc
-                        background: { r: 255, g: 255, b: 255, alpha: 1 }, // Specify the background color to be used to fill the extra padding that sharp will add. This is just RGBA values, so we want white here
-                        withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 1080px or 780px respectively, if either the width or height is less
-                      })
-                      .toFile(
-                        `${productPhotosDirectory}/${eachFileBlob?.originalname}`
-                      ); // NOTE: We used the original name sent by the frontend here
+              // Add the image's file link to the array
+              allCroppedImages.push(theResult);
 
-                    if (
-                      theCroppedImage.width === 1080 &&
-                      theCroppedImage.height === 780
-                    ) {
-                      // Add the image's file name to the array
-                      allCroppedImages.push(eachFileBlob.originalname);
-                    }
-                  } catch (e) {
-                    console.log(e);
-                    return res.sendStatus(400);
-                  }
-                } else {
-                  return res.sendStatus(400);
-                }
-              } else {
-                return res.sendStatus(400);
-              }
+              // Delete the temp file
+              deleteTempImageFile(resizedImagePath);
+
+              // allCroppedImages.push(eachFileBlob.originalname);
             }
+            // }
+
+            // NOTE THIS CATCH BLOCK IS ONLY NECESSARY IN DEVELOPMENT
+
+            // catch (e) {
+            //   // NOTE: An error will occur if the productPhotos directory does not exist, as sharp does not create directories for us, if they DO NOT exist
+            //   if (
+            //     // This is done to prevent typescript errors
+            //     typeof e === "object" &&
+            //     e &&
+            //     "message" in e &&
+            //     typeof e.message === "string"
+            //   ) {
+            //     // Check if the error message contains the text 'unable to open for write', if true, that means the productPhotos directory does not exist
+            //     if (
+            //       e.message.toLowerCase().includes("unable to open for write")
+            //     ) {
+            //       try {
+            //         // Check if the directory does NOT exist for real
+            //         const folderAlreadyExist = fs.existsSync(
+            //           productPhotosDirectory
+            //         );
+
+            //         // If directory does not exist, then create it
+            //         if (!folderAlreadyExist) {
+            //           fs.mkdirSync(productPhotosDirectory, { recursive: true }); // NOTE: Setting 'recursive' to true is necessary, if not there will be errors, because, currently, we have the src folder, and we are trying to create two new folders (i.e, public and productPhotos), so, we have to do that recursively
+            //         }
+
+            //         // Then we try to save the image into the productPhotos directory again
+            //         theCroppedImage = await sharp(eachFileBlob?.buffer)
+            //           .resize(1080, 780, {
+            //             fit: "contain", // This means, the image will be shrunk (without cutting out any part), to fit the specified dimensions (1080x700) if the image's width or height is larger than 1080 or 780 respectively. If after shrinking, and let's say, the image is now 1080x600, sharp will add extra padding (at the top and bottom, OR left and right as required), to ensure the image is 1080x780
+            //             position: "center", // A position strategy to use. Other options are top, right top, right, right bottom, bottom etc
+            //             background: { r: 255, g: 255, b: 255, alpha: 1 }, // Specify the background color to be used to fill the extra padding that sharp will add. This is just RGBA values, so we want white here
+            //             withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 1080px or 780px respectively, if either the width or height is less
+            //           })
+            //           .toFile(
+            //             `${productPhotosDirectory}/${eachFileBlob?.originalname}`
+            //           ); // NOTE: We used the original name sent by the frontend here
+
+            //         if (
+            //           theCroppedImage.width === 1080 &&
+            //           theCroppedImage.height === 780
+            //         ) {
+            //           // Add the image's file name to the array
+            //           allCroppedImages.push(eachFileBlob.originalname);
+            //         }
+            //       } catch (e) {
+            //         console.log(e);
+            //         return res.sendStatus(400);
+            //       }
+            //     } else {
+            //       return res.sendStatus(400);
+            //     }
+            //   } else {
+            //     return res.sendStatus(400);
+            //   }
+            // }
           })
         );
 

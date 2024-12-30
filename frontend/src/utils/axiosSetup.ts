@@ -5,7 +5,7 @@ export const backendURL = "https://udohsbackend.udohabasi.com";
 // export const backendURL = "https://udohs-backend.vercel.app";
 
 // The URL where the profile images can be gotten from
-export const profilePictureURL = `${backendURL}/image/profileImages`;
+// export const profilePictureURL = `${backendURL}/image/profileImages`;
 
 // The URL where the product images can be gotten from
 export const productImagesURL = `${backendURL}/image/productPhotos`;

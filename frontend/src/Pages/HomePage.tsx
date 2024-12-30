@@ -2,7 +2,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import axiosClient, { productImagesURL } from "../utils/axiosSetup";
+import axiosClient from "../utils/axiosSetup";
 import Loader from "../utils/loader";
 import { Product } from "../utils/tsInterface";
 
@@ -137,7 +137,7 @@ const HomePage = () => {
                       <div>
                         <img
                           alt=""
-                          src={`${productImagesURL}/${heroPhoto}`}
+                          src={`${heroPhoto}`}
                           className=" rounded-2xl"
                         />
                       </div>

@@ -8,10 +8,7 @@ import { hideForm, showForm } from "../utils/showOrHideSignUpAndRegisterForms";
 import Loader from "../utils/loader";
 import { userSelector } from "../reduxFiles/selectors";
 import { useSelector } from "react-redux";
-import axiosClient, {
-  productImagesURL,
-  profilePictureURL,
-} from "../utils/axiosSetup";
+import axiosClient from "../utils/axiosSetup";
 import { getDateJoined } from "../utils/getDateJoined";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Product } from "../utils/tsInterface";
@@ -54,7 +51,7 @@ const UserProfile = () => {
                           alt={user?.fullName}
                           src={
                             user?.profilePicture
-                              ? `${profilePictureURL}/${user.profilePicture}`
+                              ? `${user.profilePicture}`
                               : `/Profile_Image_Placeholder-small.jpg`
                           }
                         />
@@ -157,7 +154,7 @@ const UserProfile = () => {
                             <div>
                               <img
                                 alt=""
-                                src={`${productImagesURL}/${heroPhoto}`}
+                                src={`${heroPhoto}`}
                                 className=" rounded-2xl"
                               />
                             </div>

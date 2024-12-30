@@ -7,7 +7,7 @@ import { GiClothes } from "react-icons/gi";
 import { BiSearchAlt } from "react-icons/bi";
 import { useCallback, useEffect, useState } from "react";
 import { Product } from "../utils/tsInterface";
-import axiosClient, { productImagesURL } from "../utils/axiosSetup";
+import axiosClient from "../utils/axiosSetup";
 import Loader from "../utils/loader";
 import { BsFillArrowUpCircleFill } from "react-icons/bs";
 
@@ -357,7 +357,7 @@ const AllItems = () => {
                           <div>
                             <img
                               alt=""
-                              src={`${productImagesURL}/${heroPhoto}`}
+                              src={`${heroPhoto}`}
                               className=" rounded-2xl"
                             />
                           </div>

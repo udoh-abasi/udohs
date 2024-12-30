@@ -7,10 +7,7 @@ import { TbShoppingBagX } from "react-icons/tb";
 import { useSelector } from "react-redux";
 import { userSelector } from "../reduxFiles/selectors";
 import { useEffect, useState } from "react";
-import axiosClient, {
-  productImagesURL,
-  profilePictureURL,
-} from "../utils/axiosSetup";
+import axiosClient from "../utils/axiosSetup";
 import { Product, User } from "../utils/tsInterface";
 import Loader from "../utils/loader";
 import { getDateJoined } from "../utils/getDateJoined";
@@ -147,7 +144,7 @@ const ItemDisplay = () => {
                             alt={productOwner?.fullName}
                             src={
                               productOwner?.profilePicture
-                                ? `${profilePictureURL}/${productOwner.profilePicture}`
+                                ? `${productOwner.profilePicture}`
                                 : `/Profile_Image_Placeholder-small.jpg`
                             }
                           />
@@ -313,10 +310,7 @@ const ItemDisplay = () => {
                       className="row-start-1 col-start-1"
                       key={eachPhoto}
                     >
-                      <img
-                        src={`${productImagesURL}/${eachPhoto}`}
-                        alt="Photo"
-                      />
+                      <img src={`${eachPhoto}`} alt="Photo" />
                     </picture>
                   ))}
                 </Carousel>
@@ -431,7 +425,7 @@ const ItemDisplay = () => {
                         <div>
                           <img
                             alt=""
-                            src={`${productImagesURL}/${heroPhoto}`}
+                            src={`${heroPhoto}`}
                             className=" rounded-2xl"
                           />
                         </div>

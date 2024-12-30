@@ -4,10 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import ChatContacts from "./ChatContacts";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import axiosClient, {
-  backendURL,
-  profilePictureURL,
-} from "../utils/axiosSetup";
+import axiosClient, { backendURL } from "../utils/axiosSetup";
 import Loader from "../utils/loader";
 import { theMessageInterface } from "../utils/tsInterface";
 import { useSelector } from "react-redux";
@@ -315,7 +312,7 @@ const ChatScreen = () => {
                           alt={``}
                           src={
                             data.otherPartnerProfilePicture
-                              ? `${profilePictureURL}/${data.otherPartnerProfilePicture}`
+                              ? `${data.otherPartnerProfilePicture}`
                               : `/Profile_Image_Placeholder-small.jpg`
                           }
                         />

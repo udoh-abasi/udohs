@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import axiosClient, { profilePictureURL } from "../utils/axiosSetup";
+import axiosClient from "../utils/axiosSetup";
 import Loader from "../utils/loader";
 import { useNavigate } from "react-router-dom";
 import { chat } from "../utils/tsInterface";
@@ -154,7 +154,7 @@ const ChatContacts = forwardRef((_props, ref) => {
                         alt={``}
                         src={
                           eachChat.otherPartnerProfilePicture
-                            ? `${profilePictureURL}/${eachChat.otherPartnerProfilePicture}`
+                            ? `${eachChat.otherPartnerProfilePicture}`
                             : `/Profile_Image_Placeholder-small.jpg`
                         }
                       />

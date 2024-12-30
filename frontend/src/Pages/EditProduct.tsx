@@ -165,7 +165,7 @@ const EditProduct = () => {
 
       // Here, we mapped through the initially set list of photos. Then we return the set them on the 'croppedImage' field, so it can display to the user on the browser
       const images = productData.photos.map((eachPhoto: string) => ({
-        croppedImage: `${productImagesURL}/${eachPhoto}`,
+        croppedImage: `${eachPhoto}`,
         canvas: null,
         id: uuid4(),
         imageFormat: null,

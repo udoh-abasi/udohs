@@ -6,7 +6,7 @@ import Loader from "./loader";
 import { hideForm } from "./showOrHideSignUpAndRegisterForms";
 import { FaRegWindowClose } from "react-icons/fa";
 import { userAction } from "../reduxFiles/actions";
-import axiosClient, { profilePictureURL } from "./axiosSetup";
+import axiosClient from "./axiosSetup";
 import { useDispatch, useSelector } from "react-redux";
 import { userSelector } from "../reduxFiles/selectors";
 
@@ -39,7 +39,7 @@ const EditProfile = () => {
     if (croppedImageAndCanvas?.croppedImage) {
       return croppedImageAndCanvas.croppedImage;
     } else if (user?.profilePicture) {
-      return `${profilePictureURL}/${user.profilePicture}`;
+      return `${user.profilePicture}`;
     } else {
       return "/Profile_Image_Placeholder-small.jpg";
     }

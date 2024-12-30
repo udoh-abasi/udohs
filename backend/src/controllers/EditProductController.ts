@@ -6,6 +6,7 @@ import { imageDirectory } from "..";
 import sharp from "sharp";
 import { ObjectId } from "mongodb";
 import fs from "fs";
+import { deleteTempImageFile, uploadToCloudinary } from "./editUserController";
 
 const EditProduct = async (req: Request, res: Response) => {
   try {
@@ -63,10 +64,19 @@ const EditProduct = async (req: Request, res: Response) => {
 
       // Get the directory where product Photos are stored. On development, if you console.log this 'productPhotosDirectory', you will see 'C:\Users\dell\Desktop\udohs\backend/src/public/productPhotos'
       // NOTE: 'imageDirectory' is defined in 'index.ts' file, and it points to the folder where we have all images (i.e 'C:\Users\dell\Desktop\udohs\backend/src/public'). We just joined it with 'productPhotos', to get the product Photos folder
-      const productPhotosDirectory = path.join(
-        imageDirectory,
-        "productPhotos/"
-      );
+      // const productPhotosDirectory = path.join(
+      //   imageDirectory,
+      //   "productPhotos/"
+      // );
+
+      // NOTE: In production, when you host on 'vercel', we have a temporary folder called 'tmp', where we can store temporary files.
+      // If you try creating any other folder, you will get errors
+      const tempDir = "/tmp";
+
+      // Ensure the directory exists
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true }); // Create the temporary directory
+      }
 
       // This holds all the images
       const allCroppedImages: string[] = [];
@@ -80,6 +90,12 @@ const EditProduct = async (req: Request, res: Response) => {
             // This holds the cropped image by sharp
             let theCroppedImage: sharp.OutputInfo;
 
+            // After resizing the image with sharp, we will temporarily store it in this path
+            const resizedImagePath = path.join(
+              tempDir,
+              `resized-${eachFileBlob.originalname}`
+            );
+
             // Try to save the image into the directory
             theCroppedImage = await sharp(eachFileBlob?.buffer)
               .resize(1080, 780, {
@@ -88,16 +104,26 @@ const EditProduct = async (req: Request, res: Response) => {
                 background: { r: 255, g: 255, b: 255, alpha: 1 }, // Specify the background color to be used to fill the extra padding that sharp will add. This is just RGBA values, so we want white here
                 withoutEnlargement: true, // This means, we DO NOT want the image's width or height to enlarge to 1080px or 780px respectively, if either the width or height is less
               })
-              .toFile(
-                `${productPhotosDirectory}/${eachFileBlob?.originalname}`
-              ); // NOTE: We used the original name sent by the frontend here
+              .toFile(resizedImagePath); // NOTE: We used the original name sent by the frontend here
 
             if (
               theCroppedImage.width === 1080 &&
               theCroppedImage.height === 780
             ) {
-              // Add the image's file name to the array
-              allCroppedImages.push(eachFileBlob.originalname);
+              // Upload the image to cloudinary. This returns the image link
+              const theResult = await uploadToCloudinary(
+                resizedImagePath,
+                "productPhotos"
+              );
+
+              // Add the image's file link to the array
+              allCroppedImages.push(theResult);
+
+              // Delete the temp file
+              deleteTempImageFile(resizedImagePath);
+
+              // IN DEVELOPMENT - Add the image's file name to the array
+              // allCroppedImages.push(eachFileBlob.originalname);
             }
           })
         );
@@ -147,23 +173,23 @@ const EditProduct = async (req: Request, res: Response) => {
           }
         );
 
-        // Since we set 'returnDocument: "before", we will get the old product (before it was editted)
+        // Since we set 'returnDocument: "before", we will get the old product (before it was edited)
         if (result?._id) {
           // Get the previously saved photos
-          const previouslySavedPhotos = result.photos;
+          // const previouslySavedPhotos = result.photos;
 
-          // Delete all the images that the user removed
-          previouslySavedPhotos.map(async (eachImage) => {
-            // If the image is not in 'allPhotos', we delete it the image
-            if (!allPhotos.includes(eachImage)) {
-              await fs.unlink(
-                `${productPhotosDirectory}/${eachImage}`,
-                (err) => {
-                  if (err) console.log(err);
-                }
-              );
-            }
-          });
+          // // Delete all the images that the user removed
+          // previouslySavedPhotos.map(async (eachImage) => {
+          //   // If the image is not in 'allPhotos', we delete it the image
+          //   if (!allPhotos.includes(eachImage)) {
+          //     await fs.unlink(
+          //       `${productPhotosDirectory}/${eachImage}`,
+          //       (err) => {
+          //         if (err) console.log(err);
+          //       }
+          //     );
+          //   }
+          // });
 
           // Return the product's ID
           return res.status(200).json({ productID: result._id });
