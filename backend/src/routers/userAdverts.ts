@@ -18,7 +18,7 @@ router.get(
       // This will return all the articles that the logged in user created
       const result = await productsCollection
         .find(
-          { productOwnerID: req.user?._id?.toString() },
+          { productOwnerID: req.user?._id },
           {
             projection: {
               productOwnerID: 0,
@@ -29,7 +29,6 @@ router.get(
           }
         )
         .toArray();
-      console.log(result);
 
       return res.status(200).json(result);
     } catch {
