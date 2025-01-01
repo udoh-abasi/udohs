@@ -151,7 +151,7 @@ const EditProduct = async (req: Request, res: Response) => {
         // If everything went well, send a request to find and update the product
         const result = await productsCollection.findOneAndUpdate(
           {
-            productOwnerID: req.user?._id.toString(),
+            productOnerID: req.user?._id,
             _id: new ObjectId(productID),
           },
           {

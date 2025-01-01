@@ -16,7 +16,7 @@ const DeleteProduct = async (req: Request, res: Response) => {
 
       // Ensure the logged in user is the one that uploaded the product
       const result = await productsCollection.deleteOne({
-        productOwnerID: userID.toString(),
+        productOwnerID: userID,
         _id: new ObjectId(productID),
       });
 
