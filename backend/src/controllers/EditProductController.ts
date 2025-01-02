@@ -158,12 +158,16 @@ const EditProduct = async (req: Request, res: Response) => {
             eachLink.startsWith(photoStringInitials)
           );
 
+          console.log("The completed link", theCompletePhotoLink);
+
           // If we got the string, add it to 'allPhotos'
           if (theCompletePhotoLink) {
             allPhotos.push(theCompletePhotoLink);
           }
         }
       });
+
+      console.log("All photos array", allPhotos);
 
       if (allPhotos.length) {
         // If everything went well, send a request to find and update the product
@@ -200,13 +204,13 @@ const EditProduct = async (req: Request, res: Response) => {
           const photosToDelete: string[] = [];
 
           // Delete all the images that the user removed
-          previouslySavedPhotos.map(async (eachImage) => {
+          previouslySavedPhotos.map((eachImage) => {
             // If the image is not in 'allPhotos', we add it to the array of 'photosToDelete'
             if (!allPhotos.includes(eachImage)) {
               photosToDelete.push(eachImage);
 
               // IN DEVELOPMENT - This is how we delete from the local directory. We delete the images one-by-one
-              // await fs.unlink(
+              //  fs.unlink(
               //   `${productPhotosDirectory}/${eachImage}`,
               //   (err) => {
               //     if (err) console.log(err);
@@ -215,8 +219,10 @@ const EditProduct = async (req: Request, res: Response) => {
             }
           });
 
+          console.log("Photos to delete", photosToDelete);
+
           // Then we delete all the photos from cloudinary at once
-          cloudinary.api.delete_resources(photosToDelete, {
+          await cloudinary.api.delete_resources(photosToDelete, {
             resource_type: "image",
           });
 
