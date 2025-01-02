@@ -151,7 +151,12 @@ const EditProduct = async (req: Request, res: Response) => {
           // If 'thePhotoString' is NOT in the 'oldPhotos' array, that means it is probably in the 'allCroppedImages'
           // But the strings in the 'allCroppedImages' has the full link including cloudinary URL, while here, 'thePhotoString' is just the image name sent from the frontend (e.g "Udoh_Abasi_2024-12-30T14-40-16.169Z")
           // So first, we need to construct the string initials
-          const photoStringInitials = `https://res.cloudinary.com/drqepxmnc/image/upload/v1735569620/productPhotos/${thePhotoString}`;
+          let photoStringInitials = `https://res.cloudinary.com/drqepxmnc/image/upload/v1735569620/productPhotos/${thePhotoString}`;
+
+          photoStringInitials = photoStringInitials.slice(
+            0,
+            photoStringInitials.lastIndexOf(".")
+          );
 
           // Then find the string in the 'allCroppedImages' array that starts with the initials we constructed
           const theCompletePhotoLink = allCroppedImages.find((eachLink) =>
@@ -211,12 +216,14 @@ const EditProduct = async (req: Request, res: Response) => {
           previouslySavedPhotos.map((eachImage) => {
             // If the image is not in 'allPhotos', we add it to the array of 'photosToDelete'
             if (!allPhotos.includes(eachImage)) {
-              photosToDelete.push(
-                eachImage.replace(
-                  "https://res.cloudinary.com/drqepxmnc/image/upload/v1735797683/",
-                  ""
-                )
+              let publicID = eachImage.replace(
+                "https://res.cloudinary.com/drqepxmnc/image/upload/v1735797683/",
+                ""
               );
+
+              publicID = publicID.slice(0, publicID.lastIndexOf("."));
+
+              photosToDelete.push(publicID);
 
               // IN DEVELOPMENT - This is how we delete from the local directory. We delete the images one-by-one
               //  fs.unlink(

@@ -168,17 +168,16 @@ const EditUser = async (req: Request, res: Response) => {
         //  Delete older profile picture from the profile pic directory, to ensure junk (unused) files don't fill the directory
         if (oldProfilePicture) {
           // IN PRODUCTION - Delete from cloudinary. The 'delete_resources' takes a list of all the items to delete
-          await cloudinary.api.delete_resources(
-            [
-              `${oldProfilePicture.replace(
-                "https://res.cloudinary.com/drqepxmnc/image/upload/v1735797683/",
-                ""
-              )}`,
-            ],
-            {
-              resource_type: "image",
-            }
+          let publicID = oldProfilePicture.replace(
+            "https://res.cloudinary.com/drqepxmnc/image/upload/v1735797683/",
+            ""
           );
+
+          publicID = publicID.slice(0, publicID.lastIndexOf("."));
+
+          await cloudinary.api.delete_resources([publicID], {
+            resource_type: "image",
+          });
 
           // IN DEVELOPMENT - Delete from the local profile pic directory
           // deleteOldProfilePic(`${profilePicDirectory}/${oldProfilePicture}`);
