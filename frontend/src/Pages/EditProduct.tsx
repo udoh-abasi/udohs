@@ -256,17 +256,18 @@ const EditProduct = () => {
     return new Promise((resolve) => {
       theCanvas.toBlob((blob) => {
         // Create the image's name
-        // First, get the current date and time to make the image name unique, however, replace colons (:) with a dash (-), to avoid errors in the backend, as Windows does not allow saving images files with a colon (:) in it name
-        const currentDateTime = new Date().toISOString().replace(/:/g, "-");
+        // First, get the current date and time to make the image name unique, however, replace colons (:) with a underscore (_), to avoid errors in the backend, as Windows does not allow saving images files with a colon (:) in it name
+        const currentDateTime = new Date().toISOString().replace(/[: ]/g, "_");
 
         const slashIndex = theImageFormat.indexOf("/"); // Since the extension will be in the format 'image/wep' or 'image/jpg', we get the index of the slash, and then slice from there
         const imageExtension = theImageFormat.slice(slashIndex + 1); // So, this will return something like 'web', 'jpg' (taking out everything before slash (/))
 
         let imageName;
         if (user?.fullName) {
+          // This regex replaces ":" and spaces with underscore
           imageName = `${user?.fullName.replace(
-            /:/g,
-            "-"
+            /[: ]/g,
+            "_"
           )}_${currentDateTime}.${imageExtension}`;
         } else {
           throw new Error("User not signed in. fullName not found");
