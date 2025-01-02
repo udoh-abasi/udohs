@@ -222,9 +222,9 @@ const EditProduct = async (req: Request, res: Response) => {
           console.log("Photos to delete", photosToDelete);
 
           // Then we delete all the photos from cloudinary at once
-          await cloudinary.api.delete_resources(photosToDelete, {
-            resource_type: "image",
-          });
+          // await cloudinary.api.delete_resources(photosToDelete, {
+          //   resource_type: "image",
+          // });
 
           // Return the product's ID
           return res.status(200).json({ productID: result._id });
