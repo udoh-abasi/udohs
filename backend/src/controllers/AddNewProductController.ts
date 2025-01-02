@@ -69,7 +69,7 @@ const AddProduct = async (req: Request, res: Response) => {
             // After resizing the image with sharp, we will temporarily store it in this path
             const resizedImagePath = path.join(
               tempDir,
-              `resized-${eachFileBlob.originalname}`
+              `${eachFileBlob.originalname}`
             );
 
             // try {

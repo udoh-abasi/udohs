@@ -58,10 +58,7 @@ const EditUser = async (req: Request, res: Response) => {
       }
 
       // After resizing the image with sharp, we will temporarily store it in this path
-      const resizedImagePath = path.join(
-        tempDir,
-        `resized-${profilePic.originalname}`
-      );
+      const resizedImagePath = path.join(tempDir, `${profilePic.originalname}`);
 
       // FOR DEVELOPMENT - Get the directory where profile pic are stored. On development, if you console.log this 'profilePicDirectory', you will see 'C:\Users\dell\Desktop\udohs\backend/src/public/profileImages'
       const profilePicDirectory = path.join(imageDirectory, "profileImages/"); // NOTE: 'imageDirectory' is defined in 'index.ts' file, and it points to the folder where we have images. We just joined it with 'profileImages', to get the profile image folder
@@ -168,8 +165,14 @@ const EditUser = async (req: Request, res: Response) => {
         // This ensures ONLY one request is sent during in operation
         const oldProfilePicture = user?.profilePicture;
 
-        // IN DEVELOPMENT - Delete older profile picture from the profile pic directory, to ensure junk (unused) files don't fill the directory
+        //  Delete older profile picture from the profile pic directory, to ensure junk (unused) files don't fill the directory
         if (oldProfilePicture) {
+          // IN PRODUCTION - Delete from cloudinary. The 'delete_resources' takes a list of all the items to delete
+          cloudinary.api.delete_resources([`${oldProfilePicture}`], {
+            resource_type: "image",
+          });
+
+          // IN DEVELOPMENT - Delete from the local profile pic directory
           // deleteOldProfilePic(`${profilePicDirectory}/${oldProfilePicture}`);
         }
 

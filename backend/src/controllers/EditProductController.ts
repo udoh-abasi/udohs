@@ -7,6 +7,7 @@ import sharp from "sharp";
 import { ObjectId } from "mongodb";
 import fs from "fs";
 import { deleteTempImageFile, uploadToCloudinary } from "./editUserController";
+import { v2 as cloudinary } from "cloudinary";
 
 const EditProduct = async (req: Request, res: Response) => {
   try {
@@ -93,7 +94,7 @@ const EditProduct = async (req: Request, res: Response) => {
             // After resizing the image with sharp, we will temporarily store it in this path
             const resizedImagePath = path.join(
               tempDir,
-              `resized-${eachFileBlob.originalname}`
+              `${eachFileBlob.originalname}`
             );
 
             // Try to save the image into the directory
@@ -134,7 +135,9 @@ const EditProduct = async (req: Request, res: Response) => {
 
       // Here, we mapped through the sorted photo order, and append the photos to the 'allPhotos' list. This was done so we can preserve the order
       sortedPhotoOder.map((eachPhoto) => {
-        // Get the value (which is a string of the photo)
+        // Get the value (which is a string of the photo).
+        // NOTE: For newly added photos, the 'value' will be a string of just the image name e.g "Udoh_Abasi_2024-12-30T14-40-16.169Z"
+        // However, if it is an old image (i.e, images sent by the frontend which do NOT require sharp's resizing), then the 'value' will be the full link from cloudinary e.g 'https://res.cloudinary.com/drqepxmnc/image/upload/v1735569620/productPhotos/resized-Udoh_Abasii_2024-12-30T14-40-16.169Z_f4dusz.jpg'
         const thePhotoString = Object.values(eachPhoto)[0];
 
         // Check whether the photo is either in the oldPhoto list or allCroppedImages list
@@ -142,8 +145,23 @@ const EditProduct = async (req: Request, res: Response) => {
           oldPhotos.includes(thePhotoString) ||
           allCroppedImages.includes(thePhotoString as string)
         ) {
-          // If true, add it to the 'allPhotos' list
+          // If true, add it to the 'allPhotos' array
           allPhotos.push(thePhotoString as string);
+        } else {
+          // If 'thePhotoString' is NOT in the 'oldPhotos' array, that means it is probably in the 'allCroppedImages'
+          // But the strings in the 'allCroppedImages' has the full link including cloudinary URL, while here, 'thePhotoString' is just the image name sent from the frontend (e.g "Udoh_Abasi_2024-12-30T14-40-16.169Z")
+          // So first, we need to construct the string initials
+          const photoStringInitials = `https://res.cloudinary.com/drqepxmnc/image/upload/v1735569620/productPhotos/${thePhotoString}`;
+
+          // Then find the string in the 'allCroppedImages' array that starts with the initials we constructed
+          const theCompletePhotoLink = allCroppedImages.find((eachLink) =>
+            eachLink.startsWith(photoStringInitials)
+          );
+
+          // If we got the string, add it to 'allPhotos'
+          if (theCompletePhotoLink) {
+            allPhotos.push(theCompletePhotoLink);
+          }
         }
       });
 
@@ -176,20 +194,31 @@ const EditProduct = async (req: Request, res: Response) => {
         // Since we set 'returnDocument: "before", we will get the old product (before it was edited)
         if (result?._id) {
           // Get the previously saved photos
-          // const previouslySavedPhotos = result.photos;
+          const previouslySavedPhotos = result.photos;
 
-          // // Delete all the images that the user removed
-          // previouslySavedPhotos.map(async (eachImage) => {
-          //   // If the image is not in 'allPhotos', we delete it the image
-          //   if (!allPhotos.includes(eachImage)) {
-          //     await fs.unlink(
-          //       `${productPhotosDirectory}/${eachImage}`,
-          //       (err) => {
-          //         if (err) console.log(err);
-          //       }
-          //     );
-          //   }
-          // });
+          // IN PRODUCTION - We want to delete all old photos at once, so we store them here
+          const photosToDelete: string[] = [];
+
+          // Delete all the images that the user removed
+          previouslySavedPhotos.map(async (eachImage) => {
+            // If the image is not in 'allPhotos', we add it to the array of 'photosToDelete'
+            if (!allPhotos.includes(eachImage)) {
+              photosToDelete.push(eachImage);
+
+              // IN DEVELOPMENT - This is how we delete from the local directory. We delete the images one-by-one
+              // await fs.unlink(
+              //   `${productPhotosDirectory}/${eachImage}`,
+              //   (err) => {
+              //     if (err) console.log(err);
+              //   }
+              // );
+            }
+          });
+
+          // Then we delete all the photos from cloudinary at once
+          cloudinary.api.delete_resources(photosToDelete, {
+            resource_type: "image",
+          });
 
           // Return the product's ID
           return res.status(200).json({ productID: result._id });
