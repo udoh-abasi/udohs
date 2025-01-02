@@ -158,6 +158,10 @@ const EditProduct = async (req: Request, res: Response) => {
             eachLink.startsWith(photoStringInitials)
           );
 
+          console.log("The photo string", thePhotoString);
+
+          console.log("All cropped", allCroppedImages);
+
           console.log("The completed link", theCompletePhotoLink);
 
           // If we got the string, add it to 'allPhotos'
@@ -207,7 +211,12 @@ const EditProduct = async (req: Request, res: Response) => {
           previouslySavedPhotos.map((eachImage) => {
             // If the image is not in 'allPhotos', we add it to the array of 'photosToDelete'
             if (!allPhotos.includes(eachImage)) {
-              photosToDelete.push(eachImage);
+              photosToDelete.push(
+                eachImage.replace(
+                  "https://res.cloudinary.com/drqepxmnc/image/upload/v1735797683/",
+                  ""
+                )
+              );
 
               // IN DEVELOPMENT - This is how we delete from the local directory. We delete the images one-by-one
               //  fs.unlink(
@@ -222,9 +231,11 @@ const EditProduct = async (req: Request, res: Response) => {
           console.log("Photos to delete", photosToDelete);
 
           // Then we delete all the photos from cloudinary at once
-          // await cloudinary.api.delete_resources(photosToDelete, {
-          //   resource_type: "image",
-          // });
+          if (photosToDelete.length) {
+            await cloudinary.api.delete_resources(photosToDelete, {
+              resource_type: "image",
+            });
+          }
 
           // Return the product's ID
           return res.status(200).json({ productID: result._id });
