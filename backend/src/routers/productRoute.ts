@@ -38,7 +38,7 @@ router.post(
   AddProduct
 );
 
-// This is the put route that updates a new product
+// This is the put route that updates a product (i.e, edit a product)
 router.put(
   "/product/:productID",
   passport.authenticate("jwt", { session: false }),
