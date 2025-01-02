@@ -149,27 +149,20 @@ const EditProduct = async (req: Request, res: Response) => {
           allPhotos.push(thePhotoString as string);
         } else {
           // If 'thePhotoString' is NOT in the 'oldPhotos' array, that means it is probably in the 'allCroppedImages'
-          // But the strings in the 'allCroppedImages' has the full link including cloudinary URL, while here, 'thePhotoString' is just the image name sent from the frontend (e.g "Udoh_Abasi_2024-12-30T14-40-16.169Z")
-          // So first, we need to construct the string initials
+          // But the strings in the 'allCroppedImages' has the full link including cloudinary URL, while here, 'thePhotoString' is just the image name sent from the frontend (e.g "Udoh_Abasi_2024-12-30T14-40-16.169Z.jpg")
+          // So first, we let TS know this is a string
           let theString = thePhotoString as string;
 
+          // Take out the extension from the image name
           const photoStringWithoutExt = theString.slice(
             0,
-            theString.lastIndexOf(".")
+            theString.lastIndexOf(".") // Since the image ends with '.jpg', we get the index of the last '.' and end the slice there
           );
 
-          // Then find the string in the 'allCroppedImages' array that starts with the initials we constructed
+          // Then find the string in the 'allCroppedImages' array.This will return the matched string (which is the URL link to the image on cloudinary)
           const theCompletePhotoLink = allCroppedImages.find((eachLink) =>
             eachLink.includes(photoStringWithoutExt)
           );
-
-          console.log("The photo string", thePhotoString);
-
-          console.log("The photo string without ext", photoStringWithoutExt);
-
-          console.log("All cropped", allCroppedImages);
-
-          console.log("The completed link", theCompletePhotoLink);
 
           // If we got the string, add it to 'allPhotos'
           if (theCompletePhotoLink) {
@@ -177,8 +170,6 @@ const EditProduct = async (req: Request, res: Response) => {
           }
         }
       });
-
-      console.log("All photos array", allPhotos);
 
       if (allPhotos.length) {
         // If everything went well, send a request to find and update the product
@@ -218,12 +209,13 @@ const EditProduct = async (req: Request, res: Response) => {
           previouslySavedPhotos.map((eachImage) => {
             // If the image is not in 'allPhotos', we add it to the array of 'photosToDelete'
             if (!allPhotos.includes(eachImage)) {
-              let publicID = eachImage.replace(
-                "https://res.cloudinary.com/drqepxmnc/image/upload/v1735797683/",
-                ""
+              // First, we get the image's cloudinary public ID
+              // NOTE: 'eachImage' is in the format 'https://res.cloudinary.com/drqepxmnc/image/upload/v1735806972/productPhotos/Udoh_Abasii_2025-01-02T08_36_10.938Z_s7a7vw.jpg'.
+              // So, we want to extract the public ID from it, which in this case, is 'productPhotos/Udoh_Abasii_2025-01-02T08_36_10.938Z_s7a7vw'
+              const publicID = eachImage.slice(
+                eachImage.indexOf("productPhotos/"), // Remove everything before the 'productPhotos/'
+                eachImage.lastIndexOf(".") // Remove everything after the last dot (including the last dot). This removes the image's extension
               );
-
-              publicID = publicID.slice(0, publicID.lastIndexOf("."));
 
               photosToDelete.push(publicID);
 
@@ -236,8 +228,6 @@ const EditProduct = async (req: Request, res: Response) => {
               // );
             }
           });
-
-          console.log("Photos to delete", photosToDelete);
 
           // Then we delete all the photos from cloudinary at once
           if (photosToDelete.length) {
