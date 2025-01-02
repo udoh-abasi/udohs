@@ -151,21 +151,21 @@ const EditProduct = async (req: Request, res: Response) => {
           // If 'thePhotoString' is NOT in the 'oldPhotos' array, that means it is probably in the 'allCroppedImages'
           // But the strings in the 'allCroppedImages' has the full link including cloudinary URL, while here, 'thePhotoString' is just the image name sent from the frontend (e.g "Udoh_Abasi_2024-12-30T14-40-16.169Z")
           // So first, we need to construct the string initials
-          // let photoStringInitials = `https://res.cloudinary.com/drqepxmnc/image/upload/v1735569620/productPhotos/${thePhotoString}`;
+          let theString = thePhotoString as string;
 
-          // photoStringInitials = photoStringInitials.slice(
-          //   0,
-          //   photoStringInitials.lastIndexOf(".")
-          // );
+          const photoStringWithoutExt = theString.slice(
+            0,
+            theString.lastIndexOf(".")
+          );
 
           // Then find the string in the 'allCroppedImages' array that starts with the initials we constructed
           const theCompletePhotoLink = allCroppedImages.find((eachLink) =>
-            eachLink.includes(thePhotoString as string)
+            eachLink.includes(photoStringWithoutExt)
           );
 
           console.log("The photo string", thePhotoString);
 
-          // console.log("The photo string initials", photoStringInitials);
+          console.log("The photo string without ext", photoStringWithoutExt);
 
           console.log("All cropped", allCroppedImages);
 
