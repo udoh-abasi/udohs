@@ -128,10 +128,6 @@ app.use("/api", [
   startChatRoute,
 ]);
 
-app.get("/home", (req, res) => {
-  res.status(200).json("Welcome, your app is working well");
-});
-
 // NOTE: Because we are using socket.io, this is how we are expected to create our server
 const httpServer = createServer(app);
 
@@ -141,6 +137,8 @@ export const io = new Server(httpServer, {
 
   // Provide cors else there will be errors, since the frontend and backend are hosted on different domains
   cors: corsOptions,
+  // Important for Vercel
+  transports: ["websocket", "polling"],
 });
 
 // Type definition for authenticated socket
