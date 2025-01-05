@@ -193,9 +193,13 @@ const ChatScreen = () => {
     socket.current = io(backendURL, {
       // Options
       withCredentials: true, // Send the cookie as well
-      transports: ["websocket", "polling"],
+      transports: ["polling", "websocket"],
       reconnection: true,
       reconnectionAttempts: 5,
+      upgrade: true,
+      reconnectionDelay: 1000,
+      forceNew: true,
+      path: "/socket.io/",
     });
 
     // Listen to when there is a chat message from the backend

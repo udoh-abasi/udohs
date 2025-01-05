@@ -138,7 +138,10 @@ export const io = new Server(httpServer, {
   // Provide cors else there will be errors, since the frontend and backend are hosted on different domains
   cors: corsOptions,
   // Important for Vercel
-  transports: ["websocket", "polling"],
+  transports: ["polling", "websocket"],
+  path: "/socket.io/",
+  addTrailingSlash: false,
+  allowEIO3: true,
 });
 
 // Type definition for authenticated socket
